@@ -1,0 +1,565 @@
+content
+xml文档规则
+Schema语法
+XPaht语言
+¬¬解析XML
+
+
+一、xml文档规则
+语法：
+1，只有一个root元素
+2，<XX>...</XX>开始标签、结束标签，标签名可以有- . : a-zA-Z 0-9
+3，区分大小写
+4，空元素<XX.../>
+5，属性必须有值，且必须""或''包含，属性无序，同一个元素不能有同名属性
+6，声明：必须首行
+	<?xml version="1.0" encoding="GB2312" standalone="yes"?>
+	      遵守XML1.0规范（必须） 对文档解码用的字符集 文档是否要引用其它资源
+字符集：GBK简体中文，BIG5繁体中文，Unicode，UTF-8默认。
+保存时，中文版的windows默认以GBK编码，如果读、写用的字符集不一致，会导致乱码。
+7，字符数据
+	1）xml合并空白
+	2）实体引用：&lt; <    &gt; >   &amp;  &   &apos; '   &quot; "
+	3）<![CDATA[文本内容]]> 文本内容不做任何处理，没用；
+	
+8，处理指令：告诉XML处理程序如何处理
+	放前排。
+	<?处理指令名 处理信息?> 一般都是开发者自己提取信息处理的，在XML中它不会有作用。
+	如：<?xml-stylesheet  type="text/css" href="book.css"?> 导入样式单
+	
+9，其它
+	多写点元素比用属性好，可读性，维护，扩展等都好；
+	ASCII有两个行尾控制符：\r回车，\n换行; windows存储\r\n，unix \n，mac \r；
+xml以\n存储; 
+
+
+约束的作用：xml允许哪些元素、元素关系、支持哪些属性、元素数据类型、文本内容，默认值等；
+二、XML Schema语法
+语法：
+1，	Schema本身就是xml，Schema根元素<schema.../>
+namespace 命名空间 ns
+<xx:schema xmlns:xx="http://www.w3.org/2001/XMLSchema"> 
+xmlns属性：值是命名空间（URI公司/组织域名+项目+模块）； xx：命名空间前缀（简化URI使用）
+
+在xml中使用ns
+name是相同元素
+<元素 xmlns:别名=”空间名”>
+	<别名:name>...
+	<元素 xmlns:别名=”空间名”>
+		<别名:name>...
+同样可以在schema中给元素使用，但通常都是在前面把所有要用的的包含了；
+
+根元素 xmlns:xsi = http://www.w3.org/2001XMLSchema-instance 必须的
+xsi: noNamespaceSchemaLocation = URI   无命名空间
+xmlns:crazy=”namespace name1”    指定ns1的前缀
+xmlns:crazy2=”namespace name2”
+xsi:schemaLocation=”namespace name URI  指定路径
+namespace name2 URI” 有命名空间
+
+
+在schema使用ns
+<?xml version="1.0" encoding="gb2312"?>
+<xs:schema xmlns:xs=" http://www.w3.org/2001/XMLSchema "
+ xmlns="http://www." <!-- 使用这里的组件时，不需要前缀-->
+ xmlns[:xxx]=”可以有多个”
+ targetNamespace="x88"> <!—当前Schema组件的前缀是x88-->
+</xs:schema>
+把xmlns和targetNamespace弄一样 意思是当前文档中的组件不用前缀；
+
+
+schema其它属性：
+	1）elementFormDefault=qualified/unqualified 指定XML文档使用该Schema中定义的局部元素时是否用前缀。
+	2）attributeFormDefault=qualified/unqualified ...局部属性是否使用...
+
+
+3，注释
+<!-- -->
+<annotation>
+	<documentation.../> 读者
+	<appinfo.../> 程序
+</annotation>
+
+4，数据类型
+1）内置类型
+string
+normalizedString 	tab,/n,/r当作空白处理
+token		当作空白且压缩连续空白
+Name		合法的XML标签名 a-zA-Z,0-9,_ - : .组成;
+QName		带命名空间的标签名，可以省略前缀
+NCName		不带命名空间的标签名
+
+integer
+positiveInteger		1,2...
+negativeInteger		...-2,-1,
+nonNegativeInteger	0,1,2...
+nonPositiveInteger	...-2,-1,0
+long	[-9223372036854775808,9223372036854775807]
+unsignedLong
+int		[-2147483648,2147483647]
+unsignedInt
+short	[-32768,32767]
+unsignedShort
+byte	[-128,127]
+unsignedByte
+
+float		5.6e3(5600), 5.6, -INF(负无穷),INF(正无穷),NaN(非数),+0(正零),-0
+			其中：+0>-0;NaN大于所有;INF大于一般浮点数;double类似;
+double
+decimal		精确小数，18位，不支持科学计数法，-INF,INF,NaN等
+
+boolean		true,false,1,0
+
+前加-号表示公元前，后加Z表示UTC时间
+duration	PnYnMnDnTnHnMnS	P是必须滴，S前的n可以有小数，P12Y(12年)
+dateTime	YYYY-MM-DDThh:mm:ss.sss	T是必须滴
+data		YYYY-MM-DD
+time		hh:mm:ss.sss
+gYear		YYYY
+gYearMonth	YYYY-MM		中划线是必须滴
+gMonth		--MM
+gMonthDay	--MM--DD
+gDay		--DD
+
+anyURI		URI包含着URL，网络，文件，本地磁盘...
+language
+
+base64Binary	4n个字符
+hexBinary  偶数位16进制数
+
+
+
+
+派生类型
+<restriction.../>
+在现有类型上添加一个或多个约束。
+常用属性：id 唯一标识；base 基于类型
+12种：
+	enumeration 枚举
+	fractionDigits 定义小数点后的位数
+	totalDigits	小数+整数位数
+	length 字符长度
+	minExclusive 下界
+	maxExclusive 上界
+	minLength 字符最小长度
+	maxLength 最大
+	minInclusive 下界（包含）
+	maxInclusive 上界（包含）
+	pattern 正则
+	whiteSpace 对字符中空白的处理，preserve保留，replace替换，collapse替换再压缩
+
+Schema定义新类型语法：
+<simpleType.../>  <complexType.../>
+属性 id； name类型名字
+<simpleType name=”age_Type”>
+	< restriction base=”int”> //可以是restriction, list, union,….
+		<maxInclusive value=”100”/>//约束
+	</ restriction>
+</simpleType>
+
+基于更复杂的类型
+<simpleType name=”price_Type”>
+	< restriction> //没有指定base类型，以simpleType类型作为基类型
+		<simpleType>
+			<restriction base=”decimal”>
+				<fractionDigits value=”2”/>
+				<totalDigits value=”5”/>
+			</restriction>
+		</simpleType>
+		<maxInclusive value=”100”/>//约束
+	</ restriction>
+</simpleType>
+
+Schema定义新元素和属性语法：
+<element…/>、<attribute…/>
+属性 name、type类型（全局）
+类型还可以用<simpleType…/>,<complexType…/>指定（匿名）
+在<schema…/>下定义的都可以是根元素
+
+
+<list.../>
+属性：itemType 类型或 <simpleType…/>
+列表的值是以空白分隔的，如：
+<age_list>
+	23 24 88
+	689
+</age_list>
+约束：
+length 元素个数
+maxLength,minLength 个数范围
+enumeration
+pattern
+注意：对列表类型用enumeration和pattern约束，是对整个列表内容起作用。
+正确的写法是：
+<simpleType name=”email_Type”>
+	<restriction base=”string”>
+		<pattern value=”…”/> //每一个元素符合regex
+	</ restriction>
+</ simpleType>
+< simpleType name=”emails_Type”>
+	<list itemType=”email_Type”/>//这个元素的列表
+</ simpleType>
+
+
+
+<union.../>
+memberTypes属性，空格隔开
+多个<simpleType.../>子元素
+<simpleType name=”…”>
+	<union memberTypes=”price_Type date_Type”/>
+</ simpleType>
+元素的值 是其中一个；
+约束：enumeration,pattern
+
+list和union可以嵌套，但list不能含list。
+
+阻止派生
+<simpleType.../> final属性 =#all不能通过增加约束派生，也不能派生list，union类型。
+=restriction、list、union或其组合，不允许相应的派生
+
+有时候派生会覆盖原约束，如果合理，就会覆盖，但指定fixed=true/false就会报错了。
+
+Schema的复用
+方式：
+	1，<include…/>
+	<schema.../>的子元素；必须靠前放，除了<import.../>、<redefine.../>和<annotation.../>可以放在它前面；被包含的Schema没有ns或与当前ns相同；
+属性： schemaLocation
+	2,redefine
+	取代include，支持重定义被包含的Schema类型。
+	3，import元素
+	要么没有目标命名空间，要么空间名和当前Schema的不同，使用被导入的Schema组件时要加前缀。
+属性：id schemaLocation namespace没有则省略
+	
+	
+	
+高级语法	
+anyType 元素、属性内容不受限制；
+属性类型只能是简单类型，元素可以简单和复杂；
+定义复杂类型：
+复杂类型有两种：1，元素内容简单型，但有属性；2，有子元素，空元素或混合内容元素；
+<complexType…/>全局、匿名；
+	<simpleContent…/> 内容简单型；
+	<complexContent…/>复杂型；
+ 
+
+内容简单型
+只是extension属性；用restriction只是派生新的简单型；
+有且只能有一个子元素:<restriction…/> 或 <extension../>，如：
+<complexType name=”book_Type”>
+	<simpleContent>
+		<extension base=”decimal”>
+			<attribute name=”isbn” type=”token”/> //添加一个属性;
+		</>
+	</>
+</>
+1）派生内容简单型
+也只是extension属性；
+
+restriction的主要作用是进一步约束，删除属性（prohibited）；
+
+属性/元素
+<complexType…/>内定义，局部属性； <schema…/>子元素，<attribute…/> ref属性关联；
+常用属性：fixed 固定值；default默认值；
+<attribute ref=”全局属性名” use=”optional可选/prohibited禁止，主要用于派生/required必需”/>
+元素
+<element…/>  fixed, default, nilable(true/false 0值分配给该元素)
+同样ref可以引用全局元素
+
+
+2）派生复杂型
+由<restriction  base=”anyType”> 派生
+<sequence.../>子元素必须按顺序出现
+<choice.../> 子元素只能出现之一
+<all.../> 子元素任意顺序
+	all 子元素最多出现一次；不能与上两个一起；只做顶层元素；
+	
+Schema约定：如果某个类型是由anyType派生的，那么定义该类型时可以直接在<complexType.../>内使用<sequence.../>等来定义元素和属性。
+如：
+<xs:schema ...>
+	<xs:complexType name="book_type">
+	<!--xs:complexContent 省略了-->
+	<!—xs:restriction base=”xs:anyType”省略了
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" maxOccurs="unbounded"/> //允许出现的次数 minOccurs也是的 element、attribute、sequence、choice、all都可以用；
+			<xs:element name="price" type="decimal"/>
+		</xs:sequence>
+		<!--定义属性-->
+		<xs:attribute name="isbn" type="xs:int" use="required"/>
+	</xs:complexType>
+</xs:schema>
+还可以嵌套
+
+
+空元素类型 即内容简单型；
+混合内容类型
+<complexType name=”..” mixed=”true”>
+混合内容就是可以这样: <name>内容</name> 混合内容  <price> 混合内容 </price>
+
+复杂类型的进一步派生：限制和扩展。
+限制空元素：对属性的进一步约束；删除某个属性（prohibited）;
+扩展空元素：增加属性；增加子元素；增加mixed="true"
+限制/扩展包含子元素的类型：进一步约束属性；对子元素进一步约束；删除属性/元素
+
+阻止派生：<complexType.../>final属性=“#all"，extension，restriction及其组合。
+
+
+6）通配符
+<any.../>元素通配符，可以代替任意元素
+属性：maxOccurs minOccurs  unbounded
+namespace 元素来自 ##any任意命名空间 
+##other 父元素之外的ns 
+##local（无命名空间） 
+##targetNamespace 父元素空间
+URI 该ns
+processContents 指定XML处理器如何验证替换的元素=
+strict 必须获得ns并验证，
+lax 没有ns 也没事，
+skip不获取ns
+<xs:any maxOccurs=”4” namespace=”##local”/>
+
+
+<anyAttribute.../>属性通配符
+类似<any.../>
+
+元素替换
+给元素指定substitutionGroup属性
+替换与被替换都是全局元素
+要么是相同类型，要么是子转父(有点多态的意思)
+如： 
+element  favorite-list  类型是sequence  element ref=”item”
+全局element item
+全局 element book substitutionGroup=”item” 意思是可以替换item
+全局 element game substitutionGroup=”item” 
+XML中： <favorite-list> 可以有 <item>  <book>  <game>
+阻止替换
+element 属性 final = #all   extension   restriction   组合 意思是阻止相应的子类替换
+阻止指定派生类型的替换
+<complexType name=”item_Type” block= “#all”>该类型的元素不会被替换
+
+
+
+抽象元素和类型
+元素或类型 abstract="true"
+在XML中必须用替换元素或派生类型替换
+
+
+一致性约束
+key约束：指定内容必须存在且唯一
+keyref：两个数据的引用关系，refer属性（来自哪里）
+unique：指定内容唯一但可以不存在
+<element.../>最后面定义
+指定约束对哪些部分起作用，必须使用：
+	<selector.../>：XPath表达式，指定元素范围，只出现一次。
+	<field.../>：XPath表达式，{1,more}
+	含义：在范围内，field表示的内容遵守一致性约束。多个field，只要组合遵守即可。
+XPath就是导航用，找到元素的；
+P161
+<element name=”book-list”>  <key name=”nameKey”>
+				<selector xpath=”book”/> //在book-list/book内
+				<field xpath=”name”/>//book内的name元素满足约束
+
+外键约束 P165
+
+约束不指定命名空间，它认为元素不处在任何ns下，所以约束一定要指定前缀；P184
+
+元素组、属性组
+<group.../>
+<attributeGroup.../>
+复用，简洁，维护；
+<group ref=”分组名” minOccurs maxOccurs/>
+P166
+
+定义符号
+<notation.../>
+属性：name（符号名称，唯一）
+public：符号所标识的数据格式或处理程序，必选
+system：同上，可选
+P168
+
+
+命名空间
+xmlns或xmlns[:prefix]
+XML元素所在的范围，往往使用URL，本公司/组织域名+项目名+模块名
+由于名字一般很长，所以起了别名：prefix
+
+在Schema根元素中指定targetNamespace属性，表明组件放在这个命名空间下。
+<?...?>
+<xs:schema xmlns:xs="http://...2001/.."
+	targetNamespace="http://www.maoyinan.org/schema"
+	xmlns="http://www.maoyinan.org/schema"> //取别名，使用该空间不需要前缀
+	//...
+对一致性约束的影响：只要元素没有添加前缀，它就认为元素不在任何空间下，即使你定义了不加前缀的空间。解决办法是加前缀。
+
+elementFormDefault和attributeFormDefault意思是XML中使用Schema局部元素或属性时，能不能省略前缀，推荐qualified不省略，虽然复杂但明确。
+	
+	
+	
+	
+XPaht语言
+使用路径表达式来定位XML中的节点。
+XPath支持的节点类型:
+根节点
+元素节点：开始标签、结束标签以及之间的全部内容
+属性节点
+处理指令节点
+注释
+namespace：属性名为xmlns:prefix的
+文本
+
+概念：
+基本值：简单的数据
+项 Item: 一个节点
+序列 Sequence：Item 或 Item集合
+步step
+/list/book/name 每一个都是一步
+步语法：轴：：节点测试[限定谓语]
+XPath支持的轴： P285 可以以当前结点选取一批节点
+ancestor 选取当前结点所有祖先 ancestor-or-self  attribute  child  descendant后代节点
+descendant-or-self following当前结点结束标签之后的所有节点  following-sibling  namespace  parent  preceding与following对应 preceding-sibling  self
+节点测试
+从这一批中再选出特定的
+nodename child::book    node()所有匹配节点   text()所有文本节点 child::text()
+comment()   processing-instruction   *不过滤
+限定谓语
+再精选
+[] 内，一个boolean值，如child::book[position()=1]
+
+简写
+child轴是default，可以省略；
+@代替attribute轴  book/@isbn  ->  child::book/attribute::isbn
+//代表后代节点，包括自己
+. 当前结点
+.. 上一级节点
+
+节点类型:
+父节点、兄弟节点
+祖先节点：包括父节点，以及之外的
+后代节点：包括子节点，以内的
+
+XPath路径
+绝对路径以/开头
+相对路径不会，基路径是？
+路径以/分隔
+
+
+运算符与表达式
++ - * div mod；
+所有数值都是double型的；
+abc-xyz 与 abc – xyz不同，前者是一个整体，后者是计算；
+= != < <= > >=；
+and or 短路；
+| 组合
+
+for $var in 序列 return expr  $var代表序列的每一项
+
+if(条件)
+then reVal1
+[else if(条件)
+then reVal2...]
+else
+oterVal
+
+some $var in 序列 satisfies 条件:有一项满足条件
+every $var in 序列 satisfies
+
+
+函数
+P295
+字符串
+数值
+日期和时间
+boolean
+节点相关
+序列
+
+
+
+解析XML
+流行解析器：
+	DOM：document object model文档对象模型：DOM解析器读入整个文档（常驻内存的树状结构）。缺点：读取整个文档，内存开销。目前最新版本 DOM Level 3；
+	SAX：simple api for xml事件驱动机制。SAX解析器发现开始，结束等事件，就会向外发送一次事件，程序员编写事件监听来获取信息。
+	内存极小，速度更快。最新 SAX 2.0；
+
+XML解析器：Apache的Xerces项目，提供C++，Java，Perl等语言的实现。可以下载；
+
+
+xerces-c 3.1.4
+来自官网
+xerces-c-3.1.4\projects\Win32\下VC14 对应vs2015（C:\Program Files (x86)下可以看），公司.net 2003 对应v7.1；
+debug/release   static/dll  32/64位 等配置;
+编译工程XercesLib  xerces-c_3.lib(Release) / xerces-c_3D.lib (Debug)
+如果你是链接静态库，你要以XERCES_STATIC_LIBRARY宏编译程序（以关闭dll机制）；
+几个test/sample工程，可以参考；
+
+使用
+DomTest工程，有测试注释；
+
+
+XQuery是查询XML数据的，类似SQL语句，要想获得查询结果，界面上有大量工具，代码中要借助专门的API。
+XQuery建立在XPath上。
+
+
+
+疑问：
+1，字符数据 <<![CDATA[文本内容]]> 为什么[CDATA]也输出了？
+
+
+
+
+xerces在实际工程中的使用
+官网：http://xerces.apache.org/xerces-c/
+API手册：http://xerces.apache.org/xerces-c/apiDocs-3/classXercesDOMParser.html
+
+
+打开….\xerces-c++ 3.1.4\xerces-c-3.1.4\projects\Win32  sln，编译XercesLib生成lib和dll。
+copy到你要用的项目中，lib放在obj目录，dll放在exe目录。
+VC14是vs2015，VC7.1是VS2003。
+
+stdafx.h
+#ifdef _DEBUG
+#pragma comment(lib, "Debug\\xerces-c_3D.lib")
+#else
+#pragma comment(lib, "Release\\xerces-c_3.lib")
+#endif
+
+把src\xerces都copy到项目中 ，include目录，方便点。
+解析xml：
+封装的MyXml.h  MyXml.cpp
+using namespace xercesc;
+/*初始化Xerces系统，before using API,最后要 XMLPlatformUtils::Terminate();  
+每个process至少一次, 多次调用 Initialize 和 Terminate要匹配; */
+         try {
+             XMLPlatformUtils::Initialize();
+         }	
+         catch (const XMLException& toCatch) {
+             char *pMessage = XMLString::transcode(toCatch.getMessage());
+             fprintf(stderr, "Error during initialization! \n  %s \n", pMessage);
+             XMLString::release(&pMessage);
+             return -1;
+         }
+		//分.h 和.cpp时，这个定义为成员有点麻烦，参照MyXml.h
+XercesDOMParser *parser = new XercesDOMParser;
+try {
+        parser->parse("personal-schema.xml");
+    }
+    catch (const OutOfMemoryException&)
+    {
+	    fprintf(stderr, "OutOfMemoryException.\n");
+	    return false;
+    }
+    catch (...) {
+        fprintf(stderr, "parsing personal-schema.xml failed at line %i\n", __LINE__);
+        return false;
+}
+
+if (!parser->getErrorCount()) {
+DOMDocument *document = parser->getDocument();
+DOMNode *node = document->getFirstChild();
+//各种api
+}
+XMLPlatformUtils::Terminate();
+
+
+
+
+
+

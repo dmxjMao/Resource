@@ -1,0 +1,721 @@
+Linux优势
+服务器稳定强大、服务器软件免费，服务器上上之选；
+便宜、速度快；
+嵌入式系统：家电、手机、数字相机。。。；
+
+X Window System
+Linux上一套软件而已，XFree86计划，X Server管理显卡屏幕鼠标键盘等；
+快捷键
+Ctrl + Alt + F1~F6，切换终端；
+Win键：工作空间；
+VirtualBox增强工具：自动调整分辨率、鼠标捕获；
+调整图标大小：右键图标resize icon；
+修改桌面背景：右键桌面；
+添加输入法：system tools，setting，添加语言；
+设置快捷键：setting，keyboard，拉到最下面添加，手动找程序路径，如：/usr/bin/gnome-terminal；
+
+
+
+硬件
+介绍
+ 
+PCI、AGP、SATA。。。随时代变化，推陈出新；
+CPU
+Intel和AMD；
+频率：运算次数/单位时间，外频：CPU与接口设备传输/运算，超频：工作在额定功率之上，更快但不稳定，够快了不用，而且PC的速度和内存、CPU、显卡速度，硬盘的速度以及其它相关的输入输出接口速度有关；
+显卡
+GPU，显卡上处理耗时的画面数据，减轻CPU负担；
+显存，画面质量；
+BIOS
+主板上的软件；
+
+系统宕机怎么办？
+软件-》硬件，硬件排查：超频？机壳、CPU等硬件工作温度过高？硬件损坏、兼容？等等；
+选购
+仁者见仁智者见智；
+
+一般小型主机且不含 X Window 系统： 
+o 用途：家庭用 NAT 主机或小型企业之非图形接口小型主机。 
+o CPU：大于 Pentun 133 以上等级即可。 
+o RAM：至少 32MB ，不过还是大于 64MB 以上比较妥当！ 
+o 网络卡：一般的 10/100 Mbps 即可应付。 
+o 显示卡：随便！只要能够被 Linux 捉到即可，例如 S3 或 Sis 6326 
+o 硬盘：2GB 以上即可！ 
+• 桌上型 Linux 系统/含 X Window ： 
+o 用途：Linux 的练习机或 Office 工作机。 
+o CPU：最好等级高一点，例如 P-III 或 K7 以上等级。 
+o RAM：一定要大于 256MB 比较好！否则容易有停顿的现象。 
+o 网络卡：普通的 10/100 Mbps 就好了！ 
+o 显示卡：使用 32MB 以上内存的显示卡！ 
+o 硬盘：越大越好，最好有 20GB 。 
+
+
+• 中型以上 Linux 服务器： 
+o 用途：中小型企业/学校单位的 FTP/mail/WWW 等网络服务主机。 
+o CPU：最好等级高一点，例如 P4 或 K7 以上等级。甚至可以考虑使用双 CPU 系统。 
+o RAM：最好能够大于 512MB 以上，大于 1GB 更好！ 
+o 网络卡：知名的 3Com 或 Intel 等厂牌，比较稳定效能较佳！注意，也可选购 10/100/1000 Mbps 的速度。 
+o 显示卡：如果有使用到图形功能，则一张 64MB 内存的显示卡是需要的！ 
+o 硬盘：越大越好，如果可能的话，使用 SCSI 或者磁盘阵列，或者网络硬盘等等的系统架构， 能够具有更稳定安全的传输环境，更佳！ 
+
+
+
+在Linux中表示
+每个装置都是一个“文件（档案）”；，/dev目录下
+IDE 硬盘机 	/dev/hd[a-d] 
+SCSI 硬盘机 	/dev/sd[a-p] 
+USB 随身碟 	/dev/sd[a-p](与 SCSI 硬盘一样) 
+CDROM 	/dev/cdrom 
+软盘机 	/dev/fd[0-1] 
+打印机 	/dev/lp[0-2] 
+鼠标 	/dev/mouse 
+磁带机 	/dev/ht0 (IDE)或 /dev/st0 (SCSI 界面) 
+
+
+
+GNU计划
+史托曼发起的：建立一个自由、开放的Unix操作系统；gcc（GNU C
+ Compliler c语言编译器）、glibc（GNU C Library c函数库）、Bash shell等；
+
+为了避免自由软件（开放源码）被利用成为专利软件，史托曼草拟了GPL（General Public License通用公共许可证），也就是说，你可以任意修改发行，但你的软件不能取消GPL授权，而商家包括自由软件工作者如何获利，大部分都是在以“服务”为生，毕竟不是每个人都会写软件的；
+
+为了方便用户使用，Linux distribution（【Kernel + Softwares + Tools + OS安装程序】，网上共享或光盘安装）出现了，商业公司卖这个东东，包括Red Hat、Ubuntu、Fedora。。。，他们都基于Linux GPL，所不同的可能就是自家所开发的界面、管理工具、管理模式等不同；
+
+虚拟机
+虚拟机，就是个软件，但是它能使用计算机的物理资源（cpu，内存，硬盘。。。），能虚拟出几个逻辑独立的操作系统，互不影响；
+virtualbox轻便免费；VMware先进商业；
+
+安装Linux主机
+必须要针对distributions的特性、服务器软件的能力、未来的升级需求、硬件扩充需求等等来考虑，进行合理的主机规划，《硬件-选购》；
+Windows是安装在C盘里的，Linux也是，安装在磁盘上的；
+
+磁盘分区
+虚拟机下，磁盘档案：/dev/vd[a-p]；
+P83主板6个SATA插槽，PC有2个SATA磁盘（装在1，5槽）和1个USB磁盘，SATA1：sda，SATA5：sdb，USB（开机才捕获）：sdc;
+
+一块磁盘，数据记录在磁盘盘上面，磁盘盘又细分“扇区”和“磁道”两种单位，Sector大小有512bytes和4bytes两种；
+第一个扇区记录整颗磁盘的重要信息，早期叫MBR（Master Boot Record），现在大于2TB的，称为GPT（GUID partition table），它们就是“分区表”，最初磁盘像“原木”，切割后才能使用；
+
+ 
+第一个扇区512bytes会有两种数据：
+1）主要启动记录区（MBR安装开机管理程序的地方）；
+2）分区表，64bytes，磁盘最多有4个分区；
+ 
+ 
+
+GPT，磁盘容量 > 2TB时；
+ 
+
+
+
+开机程序
+BIOS与UEFI机制；
+CMOS是记录各项硬件参数且嵌入在主板上的存储器，BIOS则是写入主板的软件程序（韧体，计算机执行的第一个程序）；
+大致流程：
+开机-》BIOS-》读取硬件设备，如硬盘-》读取第一个扇区MBR（开机管理程序Boot loader）-》加载核心文件-》开始操作系统的功能；
+BIOS与MBR由硬件支持，Boot loader则是由OS写入MBR的一套软件，它包括：
+
+提供选单：用户可以选择不同的开机项目，这也是多重引导的重要功能！
+• 	载入核心文件：直接指向可开机的程序区段来开始操作系统；
+• 	转交其他loader：将开机管理功能转交给其他loader负责。
+ 
+
+UEFI，定位和BIOS一样，P94；
+
+
+
+安装系统
+了解Linux《文件系统》；
+
+《VirtualBox详细安装使用教程(图文)》、百度文库
+
+虚拟机安装Centos
+下载VirtualBox -》下载IOS镜像，Centos官网-》磁盘分区，P124；
+安装VirtualBox增强工具；
+
+安装报错：
+The virtual machine 'Centos7-Everything' has terminated unexpectedly during startup with exit code 1 (0x1). More details may be available in 'C:\Users\dmxjMao\VirtualBox VMs\Centos7-Everything\Logs\VBoxHardening.log'.
+
+
+
+软件安装
+Linux上的软件几乎都是经过GPL授权的，都提供源代码，你可以随意定制；
+
+make简化编译过程，搜索Makefile文件（如何编译）；
+软件开发商会写一支侦测程序来侦测用户的作业环境，主动建立Makefile规则文件，它叫configure；
+ 
+
+Tarball软件
+就是将源码用tar打包，再gzip压缩，tarball文件 *.tar.gz之类的；
+ 
+
+RPM
+直接拿厂商提供的可执行文件；
+Fedora，CentOS，SuSE等使用；
+
+RPM机制就是定义一些管理软件的规则，比如：1，软件依赖的话，安装A需要B，那有网络就去下载B先；2，在线升级；3，终端指令； 等等；
+RPM文件在安装时，先读取文件参数，对比Linux环境，找依赖（如果依赖无法安装即失败），安装完毕后，软件信息会写入？/var/lib/rpm目录下（升级查询等都靠它）
+
+ 
+SRPM（带Source的RPM，同RPM一起Release），编译它生成适合环境的RPM；
+
+查询和校验
+rpm [–q查询软件是否安装a查询所有]   ,  /var/lib/rpm
+rpm [-ql路径i详细c配置文件d说明文件R依赖文件]
+rpm [-qf文件所属软件]
+rpm –qp[licdR]未安装的文件信息
+
+
+
+yum是Red Hat系统的软件管理工具；
+CentOS将软件Release到YUM服务器上
+ 
+
+yum指令
+查询
+yum [-y用户输入自动yes --installroot=/some/path自定义路径] [search查找软件list列出yum server上的软件info软件详细provides提供文件的软件]
+yum list updates 列出server可供升级的软件
+
+安装
+yum [install安装update升级]
+
+卸载
+yum remove 程序名
+
+yum配置文件
+CentOS的映射站点可能选错，导致下载非常慢
+vim /etc/yum.repos.d/CentOS-Base.repo 
+baseurl-》软件库的实际网址
+
+软件群组
+yum [grouplist可用群组groupinfo组内软件名groupinstall安装所有groupremove移除]
+
+
+
+
+
+Linux操作系统
+OS的概念都是一样的，连接着硬件与软件的桥梁；Linux就是GNU GPL授权模式的一个“软件”，任何人均可取得源码并修改发行；
+
+寻找帮助
+g + tabtab，200多条！
+【--help】选项，但是bc的scale，+-*/^%等用法就不会用，--help常用于协助查询【指令的选项与参数】信息；
+
+【man 指令】manual，使用手册；
+如man date，注意有出来的页面叫“man page”, DATE(1)这个1是有意义的，man man区段；
+man page常用快捷键：
+Page Down/空格、Home、/(?)word向下/上搜索、n/N继续搜索、q推出man page；
+与指令相关的说明文档可能有多个，如man -f man可能出现 man(1)，man(7)，默认的man page是数字较小的，man 7 man可以指定，也可以修改/etc/man_db.conf调整顺序；
+man -k 关键词，包含关键词的文档；
+man -f等价于 whatis ，man -k 等价于 apropos，要先用root身份建立相关db，即执行# mandb；
+
+【info 指令】manual的链接版，按“h“看快捷键；
+
+其他
+可以参考下面三个地方的文档，软件开发者制作的“帮助文件”一般也会放在这里；
+/usr/share/man，/usr/share/info，/usr/share/doc，。。。
+
+关机
+who：谁在线；
+netstat –a： 网络联机状态；
+ps –aux：后台执行的程序；
+
+sync：数据写入磁盘，reboot/shutdown内联；
+reboot：重启；
+shutdown：关机；
+
+
+文件系统
+结构
+文件系统是针对分区(partition)的，本地、网络上的filesystem都可以挂载，对分区格式化以建立fs；
+
+ 
+ 
+
+挂载
+将目录作为“进入点”（称为挂载点），进入磁盘分区槽的数据所在位置；
+ 
+
+权限
+任意文件都有【User，Group，Other】三种身份的权限；
+/etc/passwd，系统账号信息；/etc/shadow，个人密码；/etc/group，群组信息；
+
+ls -al  (ll –a)
+drwxr-xr-x.（权限） 2（连接数） Morris（ower） Morris（group） 4096（bytes） Mar 10 19:23（最后修改时间） Documents（档案名）
+
+
+指令
+/etc/group，群组信息中要有；
+chgrp [-R]递归 users群组名 x.cfg目录或文件名；
+
+/etc/passwd，拥有者要有；
+chown [-R] myn:users x.cfg 可以连组一起改；owner为myn，组为users；
+
+r:4 w:2 x:1，chmod [-R] 664 x.cfg；
+-rw-rw-r—664， -rwxr-xr-x755，-rwxr-----740其他人不可见；
+另一种方式：u,g,o,a,+,-,=；
+chmod u=rwx,go=rx .xcfg，chmod a+w x.cfg所有人添加w权限；
+
+在linux下，只要文件具有x属性，就可以被执行，与其后缀名无关，但是通常我们会加上后缀名，如*.sh脚本，*.Z,*.tar,*.tar.gz,*.zip,*.tgz压缩包，*.html，*.php。。。；
+
+
+
+目录权限
+r 可以读（ls）目录结构列表；
+w 可以修改目录结构列表（创建文件或目录、删除无论权限为何、重命名、移动）；
+x 可以进入（cd）成为工作目录；
+
+默认权限
+umask [-S符号表示] ，掩码：默认值要减掉的权限；umask 0000 修改；
+默认建立文件：-rw-rw-rw-，目录：drwxrwxrwx；
+
+隐藏属性
+chattr [+-=] [Aatime不改S同步写磁盘a只能增加数据c保存时压缩读取时解压d dump i不能动s永久删除u缓存删]
+lsattr [-a隐藏文件d目录本身R递归]
+
+特殊权限
+Set UID，s在owner的x位置上；
+
+SUID 权限仅对二进制程序(binary program)有效，如cat、passwd；
+• 执行者对于该程序需要具有x 的可执行权限；
+• 本权限仅在执行该程序的过程中有效(run-time)；
+• 执行者将具有该程序拥有者(owner) 的权限，如cat的owner是root，但cat没有SUID权限。
+
+Set GID，s在group的x位置上；
+	类似SUID，执行者将具有该程序群组 的权限，同时，一个目录也可以设定SGID，用户进入此目录，有效群组变为该目录群组，这样用户新建文件时，新文件群组为该目录群组；
+
+Sticky Bit，t在other的x位置上；
+只对目录有效，目录有wx权限，其下的文件/目录，只有自己与root能删除；
+
+4 SUID，2 SGID，1SBIT，
+chmod 4775 .。。。
+chmod u=rwxs,g+s,o=x test;
+
+目录
+目录树的根目录是“/“，“~”家目录，“~Morris”Morris的家目录，”-”上一个工作目录；
+
+目录配置
+依据FHS（Filesystem Hierarchy Standard）标准，规范特定目录下应该放置什么样的数据，它的三层主目录是：/根目录 , /var运行时，/usr(Unix Software Resourse)应用程序；
+《鸟叔 P225》建议的目录配置；
+
+指令
+cd，变换目录；
+pwd [-P]，显示当前目录；
+mkdir [-mp]，建立目录；
+rmdir，删除目录；
+
+
+文件
+
+指令
+ls [d目录i”inode”F分类R递归St排序]
+cp [i覆盖询问l硬链接s软链接p非默认属性r递归u目标旧或不存在复制d软链接属性a”drp”组合] 源1 (源2...) 目标
+rm [f强制i询问r递归]
+mv [fiu源较新才更新] 源1(源2...) 目标
+==================文件内容=============================
+cat [b行号空白行无E显示断行字符n行号T标记tab v特殊字符A”vET“组合] 显示全文内容
+more 文件
+快捷键：空格，翻一页；Enter，翻一行；/string，当前页搜索；b，回翻；
+less 文件
+快捷键：空格/PageDown，翻一页；/(?)string；n/N，继续（反向）搜索；g，去第一行；G，去最后一行；
+head [-n 数字，负数是不要前n行] 文件，显示前n行； tail类似
+od [-t cASCII字符dox[size]十八十六进制，每个整数占size位] 二进制文件；
+touch [-acm修改atime ctime mtime dt欲修改的时间] 文件，无选项会新建文件；
+====================查找============================
+file 文件，查看文件类型；
+which [-a所以PATH的指令] 指令，查找指令完整路径；
+whereis [l列出查找目录b只找二进制m只找manual下 s源文件u除了bms] 档案名；
+locate [-i忽略大小写r正则l 数字，列出] 关键词，whereis和locate从已建立的db找，find从硬盘找，所以有时候找不到，P273更新db；
+find [PATH] 
+[option 
+–a/c/mtime n n天前的24h内 +n n天前不含n –n n天内 –newer file比file还要新的
+-uid/gid n –user/ group name –nouser/nogroup
+-name filename –size[+大-小][ck]，如-size +50k比50k大的文件 –type[f普通b设备d目录l链接s套接字 p管道 –perm [-完全包含/包含任意]mode =权限
+] [action]
+find / -mtime 0，0代表当前时间；
+find / -name “*passwd*”，通配符是通用的；
+find / -perm /7000 –exec ll {}\;  action，{}代表查找内容；
+==================备份还原、光盘刻录=========================
+《鸟叔Chap8.4、8.5、8.6》
+====================================================
+
+压缩
+*.Z 		compress 程序压缩的文件，过时； 
+*.zip 	zip 程序压缩的文件，兼容win； 
+*.gz 	gzip 程序压缩的文件，GNU计划； 
+*.bz2 	bzip2 程序压缩的文件； 
+*.xz 	xz 程序压缩的文件，bzip2，xz比gzip好，配合tar； 
+*.tar 	tar 程序打包的数据，并没有压缩过； 
+*.tar.gz 	tar 程序打包的文件，其中并且经过 gzip 的压缩 
+*.tar.bz2 tar 程序打包的文件，其中并且经过 bzip2 的压缩 
+*.tar.xz 	tar 程序打包的文件，其中并且经过 xz 的压缩 
+
+gzip [-c压缩数据输出屏幕d解压t校验一致性v压缩比#1-9，1最快压缩最差，默认6] 档案名，
+gzip –c services > services.gz，保留源；
+zcat/zmore/zless/zgrep，针对gzip；
+
+bzip2 [-k保留源，其他同gzip]，bzcat/bzmore/bzless/bzgrep；
+xz [-l列出压缩信息，其他同bzip2]，xzcat...；
+tar [-z用gzip压缩j用bzip2 –J用xz -c打包v查看档案详细t查看打包档案x解压C指定目录解压-f目标档案名，和f紧挨] 目标 源
+压缩：tar -jcv -f filename.tar.bz2 要被压缩的文件或目录名称
+• 查询：tar -jtv -f filename.tar.bz2
+• 解压缩：tar -jxv -f filename.tar.bz2 -C 欲解压缩的目录
+解压单个文件
+tar -jtv -f /root/etc.tar.bz2 | grep 'shadow'，查询压缩包里的文件
+tar -jxv -f /root/etc.tar.bz2 etc/shadow，解压
+除去一些文件
+tar -jcv -f /root/system.tar.bz2 --exclude=/root/etc* \ > --exclude=/root/system.tar.bz2 /etc /root
+
+磁盘
+df [-a所有kmh bytes格式T列出fs名称i 以inode数量显示]，文件系统整体磁盘使用量；
+du [-a所有s总量S不含子目录总量kmh易读] 档案名，档案使用量；
+lsblk [-d磁盘f磁盘fs名-i ASCII输出m权限p完整路径t详细] 设备，list block device，P312；
+blkid 设备UUID；
+parted 设备 print，分区信息；
+磁盘分区、格式化、校验、挂载，《鸟叔Chap7.3》；
+
+
+链接
+1）	软link，快捷方式；
+独立的文件；
+
+2）inode连结，硬link；
+
+不能跨Filesystem；
+• 不能link 目录；
+ln [-s软f目标覆盖] 源 目标
+
+
+
+vi编辑器
+Unix系统内建vi，vim是vi的增强版，是个【程序开发工具】；
+
+常用vi操作
+ctrl+d/u，翻半页；
+n空格，移动n个字符；H/M/L当前页第一/中间/最后行的第一个字符；
+G文件最后，nG第n行，gg文件开始，n回车，向下移动n行；
+u复原，ctrl+r重做；
+(n)x(del)，X(backspace)；(n)dd删除整行；d$删除光标到行最后；dG光标到文件最后；
+(n)yy复制行；p，P光标之前、之后行粘贴；
+/(?)word查找；
+:n1,n2s/word1/word2/g(c提示用户)，[n1,n2]行之间将word1替换为word2；:1,$s/word1/word2/g;
+.小数点，重复上一个动作；
+:set nu行号；
+
+区块操作
+v选择列，V选择行, Ctrl+v区块选择, y复制反白, d删除反白,p粘贴，配合n，方向键；
+
+多文本编辑
+vim a.txt b.txt...
+:n 下一个文件, :N, :files列出开启的文件，也可以打开多个vim，用鼠标复制粘贴；
+
+:sp vim中打开多个窗口，:sp filename；
+ctrl+w+上下，切换窗口；
+
+ctrl+alt+t，新建tab页；
+ctrl+t，设置快捷键，打开Terminal；
+
+
+自动补齐
+ctrl+x -> ctrl+n，【文件出现的内容】；
+ctrl+x -> ctrl+o 【vim根据扩展名，使用内建关键词】；
+
+配置
+~/.viminfo 记录行为；~/.vimrc记录配置；
+/etc/vimrc不建议修改，cp /etc/vimrc ~/.vimrc，然后修改；
+:set nu	行号
+:set autoindent	自动缩排
+:set ruler	状态栏
+:set showmode	--INSERT--状态栏。
+
+:set backspace=(012)	backspace 为2 时，可以删除任意值；0 或1 时，仅可删除刚刚输入的字符
+:syntax on:syntax off	语法高亮
+	
+set ts=4，设置tab=4个空格
+	
+
+
+
+
+BASH shell
+操作OS的基本接口，它也是一支程序，称为“壳”’ ，Linux预设的shell为Bash shell；
+ 
+
+指令格式：命令 [选项] 参数，区分大小写，’\’指令太长换行；
+
+快捷键
+tab：补齐功能，命令/文件名+两次tab；
+ctrl+c：终止程序；
+ctrl+d：输入结束，相当于exit；
+shift + PageUp/PageDown，终端翻页；
+\Enter 换行输出；
+ctrl+u、k删除光标前、后指令串；
+atl 1~9终端分页切换，shift+ctrl+T新建分页，shift+ctrl+N新建窗口；
+
+通配符
+*、?、[]、[-]、[^]，和regex一模一样；
+#注释、\转义、;连续指令、!非
+&指令后台执行
+|管道
+>,>> 流重定向，取代和累加
+<,<< 流重定向
+‘’，$是纯文本，””，$保留功能
+``  先执行的指令
+() 子shell的起始结束
+{} 命令区块的组合
+
+正则
+语系影响匹配，默认LANG=C，兼容POSIX标准；
+[:alnum:] [0-9][a-z][A-Z]
+[:alpha:] [a-z][A-Z]  [:lower:] , [:upper:]
+[:blank:] 空格和tab
+[:cntrl:] 控制键，ctrl，上下左右，tab，del，bs。。。
+[:digit:] [0-9]
+[:graph:] 除了[:blank:]
+[:print:] 可打印字符
+[:punct:] 标点符号
+[:space:] 能产生空白的字符，ctrl
+[:xdigit:] [0-9A-Fa-f]
+^$行首行尾，grep ‘^$’ 空白行
+.*
+{m,n}，’o\{2,5\}’
+
+延伸正则
+egrep
++ {1,n}
+? {0,1}
+| 或
+() 组
+()+ 组
+
+
+
+grep [-A后跟数字，after后面几行B before几行—color=auto –n行号] ‘查找字符串’ filename
+
+sed [-n处理过的行才列出ef将sed动作写到文件内r延伸语法i修改文件] ‘[n1,n2行$最后一行] action，分析stdin，取代删除新增撷取特定行，管道命令；
+function：a新行新增，\再新增一行，c取代，d删除，i插入，p打印，s取代可搭配正则；
+nl /etc/passwd | sed ‘2,5d’ 删除2,5行
+sed –n ‘5,7p’ = head –n 7 | tail –n 4
+sed ‘s/旧/新/g’
+
+awk ‘{条件}. {动作..}.‘ filename，sed行处理，awk倾向于一行的分段处理；
+last –n 5 | awk ‘{print $1 “\t” $3 “lines:” NR第几行” \t cols:” NF共几列 FS当前分隔符 }’ 打印1,3列，默认列以空格或tab分隔，$0整行
+条件： >,<,>=,<=,==, !=
+cat /etc/passwd | awk ‘{FS=”:”} $3 < 10 {print $1 “\t” $3}’
+
+cat pay.txt | \ 
+> awk '{if(NR==1) printf "%10s %10s %10s %10s %10s\n",$1,$2,$3,$4,"Total"} 
+> NR>=2{total = $2 + $3 + $4 
+> printf "%10s %10d %10d %10d %10.2f\n", $1, $2, $3, $4, total}' 
+多条指令动作，分号或Enter；
+变量直接用；
+
+
+文件比对
+diff [-b多个空白相同B多行空白相同i大小写] file_src file_des，以行为单位比对
+
+cmp [-l列出所有不同字节，默认第一个]，字节比对
+
+
+变量
+规则
+echo $变量名，查看变量；
+	变量名=变量值（不能有空格）；
+	[a-zA-Z0-9]，开头不能是数字；
+	单引号，特殊字符为一般字符，双引号，var=”lang is $LANG”，保留特性，有些；
+	可以用’\’转义特殊字符，如[Enter],$,\,空格,’等；
+	赋值指令结果：var=$(指令)或`指令`；
+	代表变量值：”$变量名”或$(变量名)；
+	export 变量名，变成环境变量，共享；
+	unset 变量名，取消变量；
+
+
+变量修改
+read [-p提示t等待秒数] 变量，读取变量；
+declare [-a数组i整型x同export-r同const-p列出变量类型+aixr取消] 变量，声明变量，默认字符串；
+
+删除
+${变量#/*local/bin:}  ${变量}格式，#前面开始删，最短，##最长；%从后面开始删，%%；
+
+替换
+${变量/旧字符串/新字符串} 替换第一个；
+${变量//旧字符串/新字符串} 全部替换；
+
+变量测试
+新变量=${旧变量-值}，没有则设置；
+新变量=${旧变量:-值}，有冒号，变量没有或空字符串则设置；
++、=、：、-、？，《鸟叔P449》
+
+
+别名
+alias lm=’ls –al | more’ 简单；
+alias rm=’rm –i’ 安全；
+alias ls=’ls –color=auto’ 功能；
+alias，查看别名；
+unalias，取消别名；
+
+
+环境配置
+env，查看环境变量；
+set，查看env+自定义；
+?， 上一个指令的回传值；
+
+/etc/issue 欢迎信息，/etc/issue.net telnet的主机登入画面，/etc/motd给登入者提示，P455；
+
+login shell（登入bash，要走流程的） 和 non-login shell
+login shell流程：读取/etc/profile系统设定，读取~/.bash_profile或~/.bash_login或~/.profile，个人设定，在CentOS下个人设定:~/.bash_profile->~/.bashrc；
+/etc/profile主要内容：环境变量、/etc/profile.d/*.sh包含其他脚本等；
+然后读取个人配置；
+
+source
+不用注销，使配置生效；
+source 配置文件，或 .小数点 配置文件，将配置读进当前shell；
+
+non-login shell 只读取~/.bashrc；
+
+其他配置：/etc/man_db.conf、~/.bash_history、~/.bash_logout。。。
+
+stty(set tty) [-a所有]
+列出终端机的按键配置，^代表ctrl，intr中断erase向后删除字符。。。；
+stty erase ^h 设置；
+set设定tty配置，P463‘’
+还有/etc/inputrc、/etc/DIR_COLORS*。。。
+
+数据重定向
+指令 > 文件，>前面默认是1（stdout），
+command > file1 2> file2 ，stdout和stderr到不同文件，2>没有空格；
+
+/dev/null
+黑洞装置，吃掉任何导入的信息，如 2> /dev/null；
+
+command > file1 2>&1，stdout和stderr写到一个文件中；
+
+<,<<
+文件内容代替键盘输入
+cat > file < filein ，把filein输入到file；
+
+<<代表“结束的输入字符”
+cat > file << “eof” 输入内容+eof，而不需要ctrl+d；
+
+管道
+处理前一个指令传来的正确信息；
+cmd1 | cmd2，要求：1）|后肯定是cmd，2）cmd2能处理cmd1的正确stdout信息；
+
+撷取
+cut [-d分隔字符f取第几段-c取出区间字符]
+echo ${PATH} | cut –d ‘:’ –f 3,5  -f 1-
+
+grep [-a二进制以text方式搜索c计算找到次数i忽略大小写n输出行号v反向选择] [--color=auto] 搜索字符串 文件名
+
+
+
+
+排序
+sort [-f忽略大小写b忽略前导空格M月份缩写排序n数字排序r反向t分隔符默认tab –u相同数据取一个k区间] 文件或stdin
+cat /etc/passwd | sort，默认以第一列的字符形态排序；
+cat /etc/passwd | sort –t’:’ –k 3 以第三列排序；
+
+uniq [-ic计数]
+去掉重复数据；
+
+
+
+双向重定向
+tee [-a追加] filename，一份文件，一份stdout；
+
+
+字符转换
+tr [-d删除s取代] 字符串...，删除讯息文字；
+last | tr [a-z] [A-Z] 取代
+
+col [-x将tab转成对等的空格b]
+
+join [-t分隔符，比对第一列，相同则两个文件相同行合并i大小写12哪个文件用第一列分析] file1 file2，分析多个文件，类似sql 联合查询；
+join –t’:’ /etc/passwd /etc/shadow | head –n 3
+
+paste [-d分隔符，默认tab] file1 file2(-代表stdin)直接粘贴两行；
+
+expand [-t几个空格] file 将tab转空格；
+
+xargs
+xargs [-O去特殊字符含义p询问e结束工作字符串n使用几个参数] cmd ，产生指令参数；
+cut -d':' -f 1 /etc/passwd | head -n 3 | xargs -n 1 id（因为id不是管道指令，xargs是）
+
+
+未归档指令
+可执行文件，系统会在环境变量PATH目录下找，echo $PATH；
+
+echo $PATH查看；
+PATH=”${PATH}:/Xxx“ 添加PATH；
+locale查看修改 语言；P175
+date、cal日历、bc计算器，scale=3；P175
+quit退出程序；
+su，切换root身份；su Morris；sudo 指令；
+type [-t类型p外部指令完整路径a所有] name，指令是否为bash内建；
+ulimit [-SHacdfltu] [配额]，限制用户访问资源，P443；
+history [-n列出n条c取消缓存r将histfiles内容读到当前shell的history缓存中a追加history指令到histfiles中w写history到文件]，登入读取~/.bash_history，环境HISTFILESIZE（1000）条，！n执行、！command（执行最近开头为command的指令）；
+last [-n] 最近登录信息；
+wc [-l多少行w多少单词m多少字符]，列出文件数据统计；
+split [-b欲分区的文件大小l以行分区] file PREFIX文件前缀
+split –b 300k /etc/services services（生成的小文件自动以xxxxaa/ab/ac命名）
+cat services* >> servicesback 合成一个文件
+ll –a / | split –l 10 – lsroot ，10行一个文件；
+
+
+Shell Scripts
+脚本，批处理文件；
+
+语法
+逐行，从左到右执行指令，遇Enter（CR）执行；
+n个空白，tab等等同；
+#是注释，#!/bin/bash声明script使用的shell名称；
+
+执行 
+xx.sh 需要rx权限；
+1）/home/../xx.sh；2）./xx.sh；3）PATH，sh xx.sh；
+
+习惯
+script文件头记录
+• script 的功能；
+• script 的版本信息；
+
+
+• script 的作者与联络方式；
+• script 的版权宣告方式；
+• script 的History (历史纪录)；
+• script 内较特殊的指令，使用『绝对路径』的方式来下达；
+• script 运作时需要的环境变量预先宣告与设定。
+
+
+
+
+实例
+hello，world
+#!/bin/bash
+#Program:
+echo –e “Hello,World!”
+exit 0  #$0返回值
+
+用户输入
+read，P528
+
+随日期变化
+date，P528
+
+数值运算
+declare –i total=${val1}+-*/(整数)${val2}
+小数：echo “123.123*44.9” | bc
+
+
+
+BASH操作
+终端连续指令
+1，分号；
+2，$? && ||
+$?=0指令执行成功，
+cmd1 && cmd2，cmd1正确则开始cmd2，否则不执行；
+cmd1 || cmd2，cmd1正确则cmd2不执行，否则执行；
+
+/tmp/abc不管存在否，都建立hehe文件
+ls /tmp/abc || mkdir /tmp/abc && touch /tmp/abc/hehe &&和||只和上一条cmd $? 有关；
+
