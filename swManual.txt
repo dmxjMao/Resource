@@ -613,3 +613,131 @@ https://www.3dmark.com/
 227440133、198235765、926957359、710733498、336010326、224686413、732821710、430286532；
 
 
+vim
+https://github.com/Vim/vim  注意Vim大写
+
+yum remove vim-*
+yum -y install ncurses-devel.x86_64
+./configure --enable-pythoninterp=yes
+make install
+重启终端
+
+Vundle
+git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+ctag-master
+tagbar
+不要把Plugin 'tagbar'注释了
+nmap <F8> :TagbarToggle<CR>
+let g:tagbar_width=20
+
+
+NERDTree
+map <F7> :NERDTreeToggle<CR>
+autocmd vimenter * NERDTree " 随vim自动打开
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif " 一个窗口就关闭NERDTree
+
+
+:NERDTree /home/marty/vim7/src
+:NERDTree foo
+NERDTreeFind [<path>] 查找文件
+
+书签
+先输入NERDTree进入
+Bookmark name 创建节点书签
+OpenBookmark name
+ClearBookmarks name/ ClearAllBookmarks
+B 书签列表
+
+快捷键
+输入?
+
+
+NERD Commenter
+根据文件类型 + 快捷键 生成注释
+filetype plugin on
+\ 为<Leader>符，<Leader>符默认为 \,在.vimrc中添加let mapleader = ","可将<Leader>符变为;
+\cc 添加注释  \cu 取消注释
+\c空格 "//" toggle注释  
+\cm "/**/"注释
+\cs /*
+     *
+     */
+自定义注释？
+
+
+youcompleteme
+代码补全，语法检查，编译，tags等。
+按官网安装,先更新vim到8.0
+https://blog.csdn.net/nzyalj/article/details/75331822
+
+vim-snippets
+代码补全
+下载 ultisnips引擎
+
+
+
+ctrlp.vim
+文件查找。
+ctrl p, 打开查找面板, f切换
+ctrl d,只找文件名, r正则
+ctrl t,v,x 打开文件
+ctrl n（n~）  ctrl p(p~)查找历史
+@cd /path
+
+vim-airline
+状态栏,可以显示很多插件的内容,看文档配置.
+
+vim-surround
+快速输入匹配符:[],(),"",'',{},<标签>...
+首先光标要在内容里,它们都是vim motion单元
+ds" 删除" dst标签
+cs]) , cs"<q>, cst<p> 替换
+ysiw) 包装单词, yssb,包装行,ySiw),风骚包装;ysst标签
+ctrl+v 模式, S]包装,gS{风骚包装
+t标签, w小写单词, W大写, s句子, p段落, 
+自定义, <? php ?>, <% \r %>...
+" surround
+autocmd FileType twig let b:surround_35 = "{# \r #}"
+autocmd FileType twig let b:surround_37 = "{% \r %}"
+autocmd FileType twig let b:surround_123 = "{{ \r }}"
+
+Syntastic
+语法检查。
+
+fugitive.vim
+git工具。
+
+emmet
+强大的html,css,xml缩写引擎，类css写法；
+按ctrl+y+',';
+常用：
+1) ! -> h5骨架;
+2) div#page>div.logo+ul#navigation>li#foo$*5>a  
+	'>'子元素;
+	‘+’兄弟('~');
+	'*'重复，#foo$*5 foo1-5;
+	^上一层: div+div>p>span+em^bq(blockquote);
+	()组：(div>dl>(dt+dd)*3)+footer>p
+	.class: span.c1.c2
+	#id
+	[]自定义属性: td[title="Hello world!" colspan=3] 不写值就是="";
+	$数字:item_$$$*5, h$[title=item$]{Header $}*3
+	@数字起点方向:item_$@-*5 5-1, @3*5 3-7
+	{}文本：p>{Click }+a{here}+{ to continue}
+	$#在[]或{}中代替包装文本
+
+3) test1
+   test2
+V选择行，ctrl+y+','，输入Tag：ul>li* 或 blockquote
+4) 
+5) div>lorem,dummy text
+6) css
+	bdrs -> border-radius: bgc -> background-color:
+	m10 -> margin: 10px; m10-20 -> margin: 10px 20px;
+	m1+p2 -> margin: 1px;
+		 padding: 2px;
+	lg(left, #fc0 30%, red) 线性渐变
+	-bdrs前缀
+
+

@@ -1,0 +1,1261 @@
+常用
+symfony工程目录：/usr/local/web/
+ps -ef | grep httpd 查看进程信息
+netstat -lnp|grep 80 查看80端口信息
+systemctrl list-units --type=service –all | grep mysql  查看服务信息
+cd prj_name  php bin/console server:run 开发阶段，启动服务
+http://localhost:8000/，访问工程里的主页
+
+:set paste 粘贴 :set nopaste
+
+php bin/console debug:router (router_name) 查看路由
+php bin/console router:match /blog/my-latest 查看匹配的路由
+php bin/console debug:container 查看服务
+php bin/console lint:twig app/Resources/views/article/recent_list.html.twig
+php bin/console config:dump-reference FrameworkBundle/framework 默认配置信息
+
+cd /usr/local/mysql/bin => mysql -u root -p => 123
+
+/usr/local/lib/php.ini 
+/etc/httpd/httpd.conf
+
+bin/apachectrl start
+
+
+mysql
+show variables (like ‘’)、databases、tables、
+use XX、describe table表结构、
+SQL语句
+
+
+查找文件内容：grep -r ‘namespace Symfony\\Component’ ./
+查找文件： find . -name ‘index.*’ 默认递归
+
+symfony new my_project_name 3.4
+
+
+
+
+
+设计规则
+多语言
+官方demo，routing.yml中的homepage, URL中 /{_locale}，动态配置。
+服务容器参数。
+base.html.twig <html lang=”{{ app.request.locale }}”>
+
+主页
+
+官方demo写法。
+内置控制器：FrameworkBundle:Template:template。
+Twig语法。
+
+
+
+
+
+
+
+路由
+Annotations路由
+在控制器上面，如：
+/**
+     * Annotations路由
+     * 假设有一个/blog/{page}
+     * @Route("/blog/{slug}", name="blog_list", requirements={"page": "\d+"}
+)
+     */
+    public function listAction($page = 1)
+    {
+        // ...
+    }
+$slug可有可无，有的话名字必须匹配；
+路由中：$request->attributes->get('title')，是可以访问路由传递的额外参数的，不一定要在控制器中声明;
+router_name唯一，用于生成URL；
+两个路由匹配同一个URL第一个胜出，可用requirements + 正则/主机/条件表达式等路由条件，见官网；
+$page = 1，路由的默认值，也可以写在defaults里；
+app/config/routing.yml开头会加载annotation路由；
+
+例子：
+    /**
+     * @Route(
+     *     "/articles/{_locale}/{year}/{slug}.{_format}",
+     *     defaults={"_format": "html"},
+     *     requirements={
+     *         "_locale": "en|fr",
+     *         "_format": "html|rss",
+     *         "year": "\d+"
+     *     }
+     * )
+     */
+
+YAML路由
+
+_controller要符合规范：bundle:controller:action
+如：AppBundle:Blog:show
+AppBundle	BlogController	showAction()
+
+
+包容外部路由
+# app/config/routing.yml
+app: 
+    resource: '@AppBundle/Controller/'
+    type:     annotation 
+    prefix:   /site
+
+resource: '@AcmeOtherBundle/Resources/config/routing.yml'
+
+app是无意义的，唯一即可；
+@AppBundle会解析；
+prefix，路由前缀；
+@AcmeOtherBundle/… 导入三方资源的路由；
+
+
+路由重定向
+
+如果只是重定向的话，用rameworkBundle 的 RedirectController 则要简单的多，见官网；
+
+public function indexAction()
+{
+    	return $this→redirectToRoute('homepage'); //302（临时）重定向
+	return $this->redirectToRoute('homepage', array(), 301);//永久
+临时不会影响旧网址的数据，永久会替换
+	return $this->redirect('http://symfony.com/doc');
+}
+
+特殊路由参数
+_controller，YAML中使用
+_format，将成为 Request 对象中的"request format"，见官网；
+_fragment，#页面锚点
+_locale
+它在Request对象中有{{ app.request.locale }}，一个常见的应用：把locale包容到URL之中，见官网；
+服务容器参数，灵活使用_locale；
+可以配置默认Locale；
+ 
+
+路由中使用服务容器参数
+# app/config/routing.yml
+contact:
+    path:     /{_locale}/contact
+    defaults: { _controller: AppBundle:Main:contact }
+    requirements:
+        _locale: '%app.locales%'
+%app.locales% 这就是可置的服务容器参数；
+然后在某个位置配置这个参数，如：
+# app/config/config.yml
+parameters:
+    app.locales: en|es
+
+
+
+
+路由生成URL
+
+// /blog/my-blog-post Controller实例方法
+        $url = $this->generateUrl(
+            'blog_show',
+            array('slug' => 'my-blog-post'
+		‘category' => 'Symfony'
+		)
+        );
+额外的参数会作为Query字符串生成：/blog/my-blog-post?category=Symfony
+, UrlGeneratorInterface::ABSOLUTE_URL第三个参数 =》 生成绝对路径；
+
+
+/* @Route("/article/{slug}", name="article_show") */
+<a href="{{ path('article_show', {'slug': article.slug}) }}">
+        {{ article.title }} </a>
+模板使用path生成相对路径，url生成绝对路径；
+
+
+
+
+
+强制路由使用HTTPS
+基于Host来匹配路由
+自定义路由加载器
+数据库中查找路由
+重定向尾斜杠URL
+条件表达式的路由条件
+
+见官网；
+
+
+
+控制器
+
+获取http请求，返回响应（可以是任意）。
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+class HelloController extends Controller
+{
+    /**
+     * @Route("/hello/{name}", name="hello")
+     */
+    public function indexAction($name, Request $request)
+    {
+        return new Response('<html><body>Hello '.$name.'!</body></html>');
+    }
+}
+控制器类、控制器，它们的名字都是约定好的；
+Annotations路由已经和indexAction绑定了，如果用YAML的话，就要配置_controller；
+
+前端控制器
+web/app_dev.php；
+一小段代码，创建AppKernel实例，核心，http://www.symfonychina.com/doc/current/configuration/front_controllers_and_kernel.html
+
+
+访问服务
+
+继承controller之后，
+$templating = $this->get('templating');
+$router = $this->get('router');
+
+$mailer = $this->get('mailer');
+
+
+错误和异常
+if (!$product) {
+        throw $this->createNotFoundException('The product does not exist');
+触发http 404错误；
+如何自定义错误页，官网；
+
+
+Session
+
+$session = $request→getSession(); //默认是php原生Session
+
+Flash Message消息条子（一次性消息），见官网；
+
+
+
+Request和Response
+有各自的属性和方法，见官网；
+JsonResponse，BinaryFileResponse，StreamedResponse等；
+
+
+
+
+不用控制器直接渲染模板
+acme_privacy:
+    path: /privacy
+    defaults:
+        _controller: FrameworkBundle:Template:template //内置控制器
+        template:    static/privacy.html.twig //通常是静态模板
+
+缓存静态模板
+指南-》HTTP缓存；
+
+
+转发到另一个控制器
+
+$response = $this->forward('AppBundle:Something:fancy', array(
+        'name'  => $name,
+        'color' => 'green',
+    ));
+
+
+
+
+如何上传文件
+如何自定义错误页
+把控制器定义为服务
+扩展Action参数解析
+
+
+
+模板
+Twig
+{{ ... }} 
+“说些什么”：输出一个变量值或者一个表达式的结果到模板。 
+{% ... %} 
+“做些什么”：控制模板逻辑的*tag（标签）*，用于执行声明，如for循环语句等。 
+{# ... #}
+注释
+
+
+filters
+{{ title|upper }}
+Twig扩展-》自定义filter和函数；
+
+
+Twig模板被编译为原生php类缓存起来；
+Twig自动进行输出转义，{{ description|raw }}  关闭转义；
+
+Twig扩展
+
+http://www.symfonychina.com/doc/current/templating/twig_extension.html
+扩展可以定义（标签）tag，（筛选）filters，（测试）tests，（运算符）operators，（全局变量）global variables，（函数）functions 和（访问节点）node visitors。
+
+
+
+布局
+layout，它包含你的站点所有通用元素（定义为blocks），如：
+{# app/Resources/views/base.html.twig #} //一般叫这个名字
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% bock title l%}Test Application{% endblock %}</title>
+    </head>
+    <body>
+        <div id="sidebar">
+            {% block sidebar %}
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/blog">Blog</a></li>
+                </ul>
+            {% endblock %}
+        </div>
+ 
+        <div id="content">
+            {% block body %}{% endblock %}
+        </div>
+    </body>
+</html>
+子模板
+{# app/Resources/views/blog/index.html.twig #}
+{% extends 'base.html.twig' %} //必须是第一个标签
+
+{% bl ocktitle %}My cool blog posts{% endblock %}
+
+{% block body %}
+    {% for entry in blog_entries %}
+        <h2>{{ entry.title }}</h2>
+        <p>{{ entry.body }}</p>
+    {% endfor %}
+{% endblock %}
+
+三级继承模式：
+1，总布局：base.html.twig
+2，为每个模块创建模板，如blog/layout.html.twig
+3，在页面中组织模块，添枝加叶
+
+
+
+
+模板命名和位置
+app/Resources/views
+path/to/bundle/Resources/views
+如：app/Resources/AcmeBlogBundle/views/Blog/index.html.twig
+
+从Bundle中引入模板
+@BundleName/directory/filename.html.twig
+如：@AcmeBlog/Blog/index.html.twig
+=》src/Acme/BlogBundle/Resources/views/Blog/index.html.twig
+
+
+覆写第三方模板
+php app/console cache:clear清缓存；
+从bundle中拷贝到app/...下；
+http://www.symfonychina.com/doc/current/templating/overriding.html
+
+
+
+引入其他模板
+{# app/Resources/views/article/article_details.html.twig #}
+<h2>{{ article.title }}</h2>
+<h3 class="byline">by {{ article.authorName }}</h3>
+
+<p>
+    {{ article.body }}
+</p>
+{# app/Resources/views/article/list.html.twig #}
+{% extends 'layout.html.twig' %}
+
+{% block body %}
+    <h1>Recent Articles<h1>
+
+    {% for article in articles %}
+        {{ include('article/article_details.html.twig', { 'article': article }) }}
+    {% endfor %}
+{% endblock %}
+{ 'article': article }可以不写，因为list.html.twig中的所有可用的变量也都可以在 article_details.html.twig 中使用；
+
+
+命名空间
+# app/config/config.yml
+twig:
+    # ...
+    paths:
+        "%kernel.root_dir%/../vendor/acme/themes/theme1": theme
+        "%kernel.root_dir%/../vendor/acme/themes/theme2": theme
+        "%kernel.root_dir%/../vendor/acme/themes/common": theme
+你可以使用相同的 @theme 命名空间来引用前三个目录中的任何模板
+{{ include('@theme/header.twig') }}
+
+
+
+
+链接到Assets
+<img src="{{ asset('images/logo.png') }}" alt="Symfony!" />
+
+<link href="{{ asset('css/blog.css') }}" rel="stylesheet" />
+<img src="{{ absolute_url(asset('images/logo.png')) }}" alt="Symfony!" />
+
+css和js，见官网；
+{% block stylesheets %}
+{% block javascripts %}
+
+
+全局变量
+app.user, app.request, app.session,  app.environment, app.debug …
+
+注入Twig全局变量
+# app/config/config.yml
+twig:
+    # ...
+    globals:
+        ga_tracking: UA-xxxxx-x
+<p>The google tracking code is: {{ ga_tracking }}</p>
+
+或者使用服务容器参数
+# app/config/parameters.yml
+parameters:
+    ga_tracking: UA-xxxxx-x
+# app/config/config.yml
+twig:
+    globals:
+        ga_tracking: '%ga_tracking%'
+
+模板中嵌入控制器
+如果模板的内容需要动态生成，如查询db，处理逻辑等；
+<div id="sidebar">
+    {{ render(controller(
+        'AppBundle:Article:recentArticles',
+        { 'max': 3 }
+    )) }}
+</div>
+
+recentArticlesAction()
+return $this->render(
+            'article/recent_list.html.twig',
+            array('articles' => $articles)
+        );
+
+
+
+
+调试
+config.yml
+debug : true
+
+控制器中：
+$articles = ...;
+dump($articles);
+
+模板中：
+{{ dump(articles) }}
+
+
+
+
+配置
+主力配置：app/config/
+
+环境
+代码相同，配置等不同，这就是环境；
+通过路由：http://localhost/app_dev.php/random/10，读取不同的配置；
+
+
+环境变量
+作为服务容器参数，http://www.symfonychina.com/doc/current/configuration/external_parameters.html
+
+
+创建自定义环境
+覆写默认目录结构
+
+
+
+
+数据库
+symfony集成了Doctrine这个三方类库，使用Doctrine ORM（对象关系映射）；
+原始查询、序列化到MongoDB：http://www.symfonychina.com/doc/current/doctrine.html
+
+
+常用
+
+3.0;
+https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/basic-mapping.html#property-mapping
+
+php bin/console list doctrine
+
+
+
+
+配置db
+App/config/parameters.yml, config.yml中使用；
+
+php5以上，有MySQLi 扩展和PDO（PHP Data Objects两种方式连接mysql；
+phpinfo()可以看，详细配置辛酸过程见《Notes_linux》；
+
+php配置—with-mysqli，--with-pdo-mysql;
+设置数据库默认字符集和校对规则（charset and collation），latin是默认的，在my.cnf中配置，要重启mysql,systemctrl restart mysql.server.server；
+default_authentication_plugin=mysql_native_password
+
+phpAdmin
+https://docs.phpmyadmin.net/ -> 压缩包 -> 解压到 htdoc下，目录名必须和config.inc.php 里的$cfg['blowfish_secret']一样 -> 重启apache，输入http://localhost/phpMyAdmin/index.php
+
+
+创建schema和table
+php bin/console doctrine:generate:entity 实体创建向导
+报错：No Metadata Classes to process.
+=》
+bin/console c:c --env=dev 清缓存
+annotation就是没法生成；
+
+repositity ： 保存所有查询逻辑到一个中心位置
+
+
+Annotations格式，一个buddle只接受一种格式；
+语法参考Doctrine官网：https://www.doctrine-project.org/projects/doctrine-orm/en/latest/tutorials/getting-started.html#getting-started-with-doctrine
+
+// src/AppBundle/Entity/Product.php
+namespace AppBundle\Entity;
+ 
+use Doctrine\ORM\Mapping as ORM;
+ 
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="product")
+ */
+class Product
+{
+    /**
+     * @ORM\Column(type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+ 
+    /**
+     * @ORM\Column(type="string", length=100)
+     */
+    private $name;
+ 
+    /**
+     * @ORM\Column(type="decimal", scale=2)
+     */
+    private $price;
+ 
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $description;
+}
+Annotations里的东西叫做元数据，如何映射到数据表的；
+table名避免sql保留关键字如group，user等
+
+php bin/console doctrine:schema:validate 验证映射
+
+
+创建table
+php bin/console doctrine:schema:update --force
+就是不生成，不知道为什么（可能是没有创建repositity），一个折中的方法：先用php bin/console doctrine:generate:entity向导一个只含id的实体，然后修改Entity.php文件，然后：
+php bin/console doctrine:generate:entities AppBundle/Entity/Product --no-backup
+php bin/console doctrine:schema:update --complete --force一定要--complete
+
+php bin/console doctrine:mapping:info 查看映射
+
+
+YAML格式
+比较常规的建表，是先操作数据库，然后定义YAML，然后再关联上；
+当然，最推荐的做法是修改YAML，然后用命令更新数据库，因为它只更新一处；
+
+
+
+持久化
+写
+    $product = new Product();
+    $product->setName('Keyboard');
+    $product->setPrice(19.99);
+    $product->setDescription('Ergonomic and stylish!');
+ 
+    $em = $this->getDoctrine()->getManager();
+ 
+    // tells Doctrine you want to (eventually) save the Product (no queries yet)
+    // 告诉Doctrine你希望（最终）存储Product对象（还没有语句执行）
+    $em->persist($product);
+ 
+    // actually executes the queries (i.e. the INSERT query)
+    // 真正执行语句（如，INSERT 查询）
+    $em->flush();
+ 
+    return new Response('Saved new product with id '.$product->getId());
+
+加载测试数据
+DoctrineFixturesBundle
+
+
+读
+public function showAction($productId)
+{
+$product = $this->getDoctrine()
+        ->getRepository('AppBundle:Product')
+        ->find($productId);
+ 
+    if (!$product) {
+        throw $this->createNotFoundException(
+            'No product found for id '.$productId
+        );
+    }
+//…
+}
+
+AppBundle:Product是AppBundle\Entity\Product的快捷写法；
+$repository = getRepository()会有很多动态生成的方法，如findOneByName…
+
+
+DQL和Query Builder
+查询entity类的对象，SQL查询行；
+
+$em = $this->getDoctrine()->getManager();
+$query = $em->createQuery(
+    'SELECT p
+    FROM AppBundle:Product p
+    WHERE p.price > :price
+    ORDER BY p.price ASC'
+)->setParameter('price', 19.99);
+ 
+$products = $query->getResult();
+$products 是php实体对象；
+
+更多，见官网；
+
+
+Query Builder
+$query = $repository->createQueryBuilder('p')
+    ->where('p.price > :price')
+    ->setParameter('price', '19.99')
+    ->orderBy('p.price', 'ASC')
+    ->getQuery();
+ 
+$products = $query->getResult();
+比DQL更容易维护；
+
+
+
+
+Doctrine
+Bug Tracker
+
+三个包：Doctrine\Common，Doctrine\DBAL， Doctrine\ORM。
+Entity概念和Entity states，《Architecture》。
+
+
+Indexed Associations
+索引关联，性能，indexBy。
+
+Extra Lazy Associations
+延迟加载数据量大的结果集。
+
+Composite and Foreign Keys as Primary Key
+name + year作为pk，都指定@ORM\Id；
+使用：$em->find("AppBundle\Entity\Car", array("name" => "Audi A8", "year" => 2010))
+select c from AppBundle:Car c where c.id=?1"; ->setParameter(1, array(    "name" => "Audi A8", "year" => 2010 ))
+
+@ORM\Id @ORM\ManyToOne 外键作为pk；
+为什么？
+有很多场景，我们的entity identity是由父entity决定的，而不是自动id，它们是更有意义的pk，复用的pk；
+
+@ORM\OrderBy
+和DQL的order by一样，这个优先；
+
+Override Field Association Mappings In Subclasses
+重写关联，有时候实体定义或关联不符合需要，你可以重写它们。
+
+Paginator
+分页。
+
+Separating Concerns using Embeddables
+提取为嵌入类。
+默认值，改实体：private $status = self:STATUS_DISABLED;
+
+
+
+Basic Mapping
+/** @Entity */
+@Table(name="message")
+/** @Column(type="integer") */
+type: (optional, defaults to 'string') The mapping type to use for the column. 
+•	name: (optional, defaults to field name) The name of the column in the database. 
+•	length: (optional, default 255) The length of the column in the database. (Applies only if a string-valued column is used). 
+•	unique: (optional, default FALSE) Whether the column is a unique key. 
+•	nullable: (optional, default FALSE) Whether the database column is nullable. 
+•	precision: (optional, default 0) The precision for a decimal (exact numeric) column (applies only for decimal column), which is the maximum number of digits that are stored for the values. 
+•	scale: (optional, default 0) The scale for a decimal (exact numeric) column (applies only for decimal column), which represents the number of digits to the right of the decimal point and must not be greater than precision. 
+•	columnDefinition: (optional) Allows to define a custom DDL snippet that is used to create the column. Warning: This normally confuses the SchemaTool to always detect the column as changed. 
+•	options: (optional) Key-value pairs of options that get passed to the underlying database platform when generating DDL statements. 
+
+string: Type that maps a SQL VARCHAR to a PHP string. 
+•	integer: Type that maps a SQL INT to a PHP integer. 
+•	smallint: Type that maps a database SMALLINT to a PHP integer. 
+•	bigint: Type that maps a database BIGINT to a PHP string. 
+•	boolean: Type that maps a SQL boolean or equivalent (TINYINT) to a PHP boolean. 
+•	decimal: Type that maps a SQL DECIMAL to a PHP string. 
+•	date: Type that maps a SQL DATETIME to a PHP DateTime object. 
+•	time: Type that maps a SQL TIME to a PHP DateTime object. 
+•	datetime: Type that maps a SQL DATETIME/TIMESTAMP to a PHP DateTime object. 
+•	datetimetz: Type that maps a SQL DATETIME/TIMESTAMP to a PHP DateTime object with timezone. 
+•	text: Type that maps a SQL CLOB to a PHP string. 
+•	object: Type that maps a SQL CLOB to a PHP object using serialize() and unserialize() 
+•	array: Type that maps a SQL CLOB to a PHP array using serialize() and unserialize() 
+•	simple_array: Type that maps a SQL CLOB to a PHP array using implode() and explode(), with a comma as delimiter. IMPORTANT Only use this type if you are sure that your values cannot contain a ",". 
+•	json_array: Type that maps a SQL CLOB to a PHP array using json_encode() and json_decode() 
+•	float: Type that maps a SQL Float (Double Precision) to a PHP double. IMPORTANT: Works only with locale settings that use decimal points as separator. 
+•	guid: Type that maps a database GUID/UUID to a PHP string. Defaults to varchar but uses a specific type if the platform supports it. 
+•	blob: Type that maps a SQL BLOB to a PHP resource stream 
+
+@Id @GeneratedValue
+sql关键词用引号wrap：/** @Column(name="`number`", type="integer") */
+
+Association Mapping
+
+记得加@ORM前缀。
+OneToOne
+Unidirectional单向
+class Product
+{
+    /**
+     * @OneToOne(targetEntity="Shipment")
+     * @JoinColumn(name="shipment_id", referencedColumnName="id")
+     */
+    private $shipment;
+}
+JoinColumn 会在product表中生成shipment_id列，对应shipment表的id；
+
+
+Bidirectional 双向
+class Customer
+{
+    /**
+     * @OneToOne(targetEntity="Cart", mappedBy="customer")
+     */
+    private $cart;
+}
+
+class Cart
+{
+    /**
+     * @OneToOne(targetEntity="Customer", inversedBy="cart")
+     * @JoinColumn(name="customer_id", referencedColumnName="id")
+     */
+    private $customer;
+}
+inversedBy这边会的表会创建customer_id列；
+
+
+self-referencing
+class Student
+{
+    /**
+     * @OneToOne(targetEntity="Student")
+     * @JoinColumn(name="mentor_id", referencedColumnName="id")
+     */
+    private $mentor;导师，JoinColumn并不用
+}
+
+
+
+OneToMany
+必须双向，除非join table。
+one边mappedBy（映射many边实体），many边inversedBy（归到one边实体）
+class Product
+{
+    /**
+     * @OneToMany(targetEntity="Feature", mappedBy="product")
+     */
+    private $features;
+
+    public function __construct() {
+        $this->features = new ArrayCollection();
+    }
+}
+
+class Feature
+{
+    /**
+     * @ManyToOne(targetEntity="Product", inversedBy="features")
+     * @JoinColumn(name="product_id", referencedColumnName="id")
+     */
+    private $product;
+}
+many边（inversedBy）表生成product_id列；
+
+
+join table
+略。
+
+
+self-referencing
+class Category
+{
+    /**
+     * @OneToMany(targetEntity="Category", mappedBy="parent")
+     */
+    private $children;
+
+    /**
+     * @ManyToOne(targetEntity="Category", inversedBy="children")
+     * @JoinColumn(name="parent_id", referencedColumnName="id")
+     */
+    private $parent;
+
+    public function __construct() {
+        $this->children = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+}
+创建parent_id列；
+
+
+
+
+ManyToOne
+单向
+class User
+{
+    /**
+     * @ManyToOne(targetEntity="Address")
+     * @JoinColumn(name="address_id", referencedColumnName="id")
+     */
+    private $address;
+}
+user表创建address_id列；
+
+
+
+ManyToMany
+class User
+{
+    /**
+     * @ManyToMany(targetEntity="Group", inversedBy="users")
+     * @JoinTable(name="users_groups")
+     */
+    private $groups;
+
+    public function __construct() {
+        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+}
+
+class Group
+{
+    /**
+     * @ManyToMany(targetEntity="User", mappedBy="groups")
+     */
+    private $users;
+
+    public function __construct() {
+        $this->users = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+}
+会创建join table: users_groups  user_id group_id
+关于own和inverse边的选择：1）用 ~有～，～在～；2）哪一个是使用主体；
+
+
+self-referencing
+class User
+{
+    /**
+     * @ManyToMany(targetEntity="User", mappedBy="myFriends")
+     */
+    private $friendsWithMe;
+
+    /**
+     * @ManyToMany(targetEntity="User", inversedBy="friendsWithMe")
+     * @JoinTable(name="friends",
+     *      joinColumns={@JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@JoinColumn(name="friend_user_id", referencedColumnName="id")}
+     *      )
+     */
+    private $myFriends;
+
+    public function __construct() {
+        $this->friendsWithMe = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->myFriends = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+}
+
+@JoinColumn、@JoinTable 默认值
+name: "<fieldname>_id"
+referencedColumnName: "id"
+
+
+Inheritance Mapping
+继承。
+/** @MappedSuperclass */
+class MappedSuperclassBase
+{
+    /** @Column(type="integer") */
+    protected $mapped1;
+    /** @Column(type="string") */
+    protected $mapped2;
+    /**
+     * @OneToOne(targetEntity="MappedSuperclassRelated1")
+     * @JoinColumn(name="related1_id", referencedColumnName="id")
+     */
+    protected $mappedRelated1;
+
+    // ... more fields and methods
+}
+
+/** @Entity */
+class EntitySubClass extends MappedSuperclassBase
+{
+    /** @Id @Column(type="integer") */
+    private $id;
+    /** @Column(type="string") */
+    private $name;
+
+    // ... more fields and methods
+}
+
+单表继承 ， 多表继承
+略。
+
+重写关联
+/**
+ * @MappedSuperclass
+ */
+class User
+{
+    //other fields mapping
+
+    /**
+     * @ManyToMany(targetEntity="Group", inversedBy="users")
+     * @JoinTable(name="users_groups",
+     *  joinColumns={@JoinColumn(name="user_id", referencedColumnName="id")},
+     *  inverseJoinColumns={@JoinColumn(name="group_id", referencedColumnName="id")}
+     * )
+     */
+    protected $groups;
+
+    /**
+     * @ManyToOne(targetEntity="Address")
+     * @JoinColumn(name="address_id", referencedColumnName="id")
+     */
+    protected $address;
+}
+
+// admin mapping
+namespace MyProject\Model;
+/**
+ * @Entity
+ * @AssociationOverrides({
+ *      @AssociationOverride(name="groups",
+ *          joinTable=@JoinTable(
+ *              name="users_admingroups",
+ *              joinColumns=@JoinColumn(name="adminuser_id"),
+ *              inverseJoinColumns=@JoinColumn(name="admingroup_id")
+ *          )
+ *      ),
+ *      @AssociationOverride(name="address",
+ *          joinColumns=@JoinColumn(
+ *              name="adminaddress_id", referencedColumnName="id"
+ *          )
+ *      )
+ * })
+ */
+class Admin extends User
+{
+}
+
+重写属性
+class User
+{
+    /** @Id @GeneratedValue @Column(type="integer", name="user_id", length=150) */
+    protected $id;
+
+    /** @Column(name="user_name", nullable=true, unique=false, length=250) */
+    protected $name;
+
+    // other fields mapping
+}
+
+// guest mapping
+namespace MyProject\Model;
+/**
+ * @Entity
+ * @AttributeOverrides({
+ *      @AttributeOverride(name="id",
+ *          column=@Column(
+ *              name     = "guest_id",
+ *              type     = "integer",
+                length   = 140
+ *          )
+ *      ),
+ *      @AttributeOverride(name="name",
+ *          column=@Column(
+ *              name     = "guest_name",
+ *              nullable = false,
+ *              unique   = true,
+                length   = 240
+ *          )
+ *      )
+ * })
+ */
+class Guest extends User
+{
+}
+
+
+Working with Objects
+
+EntityManager 用UnitOfWork缓存work， em->flush才会与db交互，同理em->persist其实就是改变状态为：MANAGED，em->remove：REMOVED。
+Doctrine会维护一个map<id, Entity>，所以像下面的不管多少次查询，都不会影响性能，
+$article = $em->find('CMS\Article', 1234); =>
+$article = $em->getRepository('MyProject\CMS\Article')->find(1234);
+
+访问关联内容时，会有一个lazy loading pattern，Doctrine给你一个proxy对象代替庞大的关联内容实体。
+
+
+em→remove注意onDelete="CASCADE级联"，remove会管所有的，
+em->clear（状态：DETACHED），detach是现在开始不管。
+
+$users = $em->getRepository('MyProject\Domain\User')->findBy(array('age' => 20));
+$users = $em->getRepository('MyProject\Domain\User')->findBy(array('age' => 20, 'surname' => 'Miller'));
+//第二、三、四个参数：orderings, limit and offset 
+$tenUsers = $em->getRepository('MyProject\Domain\User')->findBy(array('age' => 20), array('name' => 'ASC'), 10, 0);
+//wherein
+$users = $em->getRepository('MyProject\Domain\User')->findBy(array('age' => array(20, 30, 40)));
+//__call magic 魔术方法
+$user = $em->getRepository('MyProject\Domain\User')->findOneByNickname('romanb');
+
+$user = $em->getRepository('MyProject\Domain\User')->findOneBy(array('nickname' => 'romanb'));
+$availableNickname = 0 === $em->getRepository('MyProject\Domain\User')->count(['nickname' => 'nonexistent']);
+
+
+
+Working with Associations
+class CommentUser
+{
+	/** ～有～，own边，写inversedBy，创建表user_favorite_comments
+	 * @ManyToMany(targetEntity="Comment", inversedBy="userFavorites")
+	 * @JoinTable(name="user_favorite_comments")
+	 */
+	 private $favorites;
+
+	/** 标记已读的栏目，创建表user_read_comments，单向，和上面的区别：comment那边不用对应
+	 * @ManyToMany(targetEntity="Comment")
+	 * @JoinTable(name="user_read_comments")
+	 */
+	 private $commentsRead;
+
+	/**编写的栏目，inverse边没有列，own边有
+	 * @OneToMany(targetEntity="Comment", mappedBy="author")
+	 */
+	 private $commentsAuthored;   
+
+	/** 写的第一个栏目，单向
+	 * @ManyToOne(targetEntity="Comment")
+	 */
+	 private $firstComment;
+}
+ private $commentsAuthored; 在mysql里怎么也生成不了author_id，可能哪里写错了。
+
+
+添加自定义操作，比如：
+获取
+public function getReadComments() {
+         return $this->commentsRead;
+    }
+使用，获取到的是Collection，还要自己操作一步，
+$user→getReadComments()→add($comment);
+同理，删除一样，$user->getComments()->removeElement($comment);
+其他业务相关的操作，一定要留意双向关联的一致性；
+
+
+
+
+Events
+事件系统：system，lifecycle，custom events + EventManager
+在EventManager注册Listeners，并dispatch；
+
+$evm = new EventManager();
+
+class TestEvent
+{
+    const preFoo = 'preFoo';
+    const postFoo = 'postFoo';
+
+    private $_evm;
+
+    public $preFooInvoked = false;
+    public $postFooInvoked = false;
+
+    public function __construct($evm)
+    {
+        $evm->addEventListener(array(self::preFoo, self::postFoo), $this);
+	 //$evm->removeEventListener(array(self::preFoo, self::postFoo), $this);
+    }
+
+    public function preFoo(EventArgs $e)
+    {
+        $this->preFooInvoked = true;
+    }
+
+    public function postFoo(EventArgs $e)
+    {
+        $this->postFooInvoked = true;
+    }
+}
+
+// Create a new instance
+$test = new TestEvent($evm); 注册一个事件
+$evm→dispatchEvent(TestEvent::preFoo); //分发事件（所有订阅者触发）
+
+
+class TestEventSubscriber implements \Doctrine\Common\EventSubscriber
+{
+    public $preFooInvoked = false;
+
+    public function preFoo()
+    {
+        $this->preFooInvoked = true;
+    }
+
+    public function getSubscribedEvents()
+    { //说明订阅的事件
+        return array(TestEvent::preFoo);
+    }
+}
+
+$eventSubscriber = new TestEventSubscriber();
+$evm->addEventSubscriber($eventSubscriber);
+
+
+lifecycle Events
+preRemove - The preRemove event occurs for a given entity before the respective EntityManager remove operation for that entity is executed. It is not called for a DQL DELETE statement. 
+•	postRemove - The postRemove event occurs for an entity after the entity has been deleted. It will be invoked after the database delete operations. It is not called for a DQL DELETE statement. 
+•	prePersist - The prePersist event occurs for a given entity before the respective EntityManager persist operation for that entity is executed. It should be noted that this event is only triggered on initial persist of an entity (i.e. it does not trigger on future updates). 
+•	postPersist - The postPersist event occurs for an entity after the entity has been made persistent. It will be invoked after the database insert operations. Generated primary key values are available in the postPersist event. 
+•	preUpdate - The preUpdate event occurs before the database update operations to entity data. It is not called for a DQL UPDATE statement nor when the computed changeset is empty. 
+•	postUpdate - The postUpdate event occurs after the database update operations to entity data. It is not called for a DQL UPDATE statement. 
+•	postLoad - The postLoad event occurs for an entity after the entity has been loaded into the current EntityManager from the database or after the refresh operation has been applied to it. 
+•	loadClassMetadata - The loadClassMetadata event occurs after the mapping metadata for a class has been loaded from a mapping source (annotations/xml). This event is not a lifecycle callback. 
+•	onClassMetadataNotFound - Loading class metadata for a particular requested class name failed. Manipulating the given event args instance allows providing fallback metadata even when no actual metadata exists or could be found. This event is not a lifecycle callback. 
+•	preFlush - The preFlush event occurs at the very beginning of a flush operation. 
+•	onFlush - The onFlush event occurs after the change-sets of all managed entities are computed. This event is not a lifecycle callback. 
+•	postFlush - The postFlush event occurs at the end of a flush operation. This event is not a lifecycle callback. 
+•	onClear - The onClear event occurs when the EntityManager#clear() operation is invoked, after all references to entities have been removed from the unit of work. This event is not a lifecycle callback. 
+
+use Doctrine\ORM\Events; 
+echo Events::preUpdate;
+
+
+Lifecycle Callbacks
+/** @Entity @HasLifecycleCallbacks */
+class User
+{
+    // ...
+
+    /**
+     * @Column(type="string", length=255)
+     */
+    public $value;
+
+    /** @Column(name="created_at", type="string", length=255) */
+    private $createdAt;
+
+    /** @PrePersist */
+    public function doStuffOnPrePersist()
+    {
+        $this->createdAt = date('Y-m-d H:i:s');
+    }
+
+    /** @PrePersist */
+    public function doOtherStuffOnPrePersist()
+    {
+        $this->value = 'changed from prePersist callback!';
+    }
+
+    /** @PostPersist */
+    public function doStuffOnPostPersist()
+    {
+        $this->value = 'changed from postPersist callback!';
+    }
+
+    /** @PostLoad */
+    public function doStuffOnPostLoad()
+    {
+        $this->value = 'changed from postLoad callback!';
+    }
+
+    /** @PreUpdate */
+    public function doStuffOnPreUpdate()
+    {
+        $this->value = 'changed from preUpdate callback!';
+    }
+}
+
+PreUpdateEventArgs $event
+
+
+
+一个更普遍的用法
+use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+
+class MyEventListener  //注册你感兴趣的事件
+{
+    public function preUpdate(LifecycleEventArgs $args)
+    {
+        $entity = $args->getObject();
+        $entityManager = $args->getObjectManager();
+
+        // perhaps you only want to act on some "Product" entity
+        if ($entity instanceof Product) {
+            // do something with the Product
+        }
+    }
+}
+
+use Doctrine\ORM\Events;
+use Doctrine\Common\EventSubscriber;
+use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
+
+class MyEventSubscriber implements EventSubscriber  //我对这个事件感兴趣
+{
+    public function getSubscribedEvents()
+    {
+        return array(
+            Events::postUpdate,
+        );
+    }
+
+    public function postUpdate(LifecycleEventArgs $args)
+    {
+        $entity = $args->getObject();
+        $entityManager = $args->getObjectManager();
+
+        // perhaps you only want to act on some "Product" entity
+        if ($entity instanceof Product) {
+            // do something with the Product
+        }
+    }
+
+<?php
+$eventManager = new EventManager();
+$eventManager->addEventListener(array(Events::preUpdate), new MyEventListener());
+$eventManager->addEventSubscriber(new MyEventSubscriber());
+
+$entityManager = EntityManager::create($dbOpts, $config, $eventManager);
+
+Entity listeners
+<?php
+namespace MyProject\Entity;
+
+/** @Entity @EntityListeners({"UserListener"}) */
+class User
+{
+    // ....
+}
+
+<?php
+class UserListener
+{
+    public function preUpdate(User $user, PreUpdateEventArgs $event)
+    {
+        // Do something on pre update.
+    }
+}
+
+

@@ -1,0 +1,283 @@
+Doctrine 内部机制
+2个结构：1）entity map，提高效率；2）属性和关联的copy，copy-on-write；
+它们会影响flush性能，优化方法：
+    Mark entities as read only. These entities can only be inserted or removed, but are never updated. They are omitted in the changeset calculation.
+    Temporarily mark entities as read only. If you have a very large UnitOfWork but know that a large set of entities has not changed, just mark them as read only with $entityManager->getUnitOfWork()->markReadOnly($entity).
+    Use Change Tracking Policies to use more explicit strategies of notifying the UnitOfWork what objects/properties changed.
+
+
+Hydration
+结果集
+    SQL to Entities
+    SQL to structured Arrays
+    SQL to simple scalar result arrays
+    SQL to a single result variable
+
+
+Own边和Inverse边
+A bidirectional relationship has both an owning side and an inverse side
+A unidirectional relationship only has an owning side.
+Doctrine will only check the owning side of an association for changes.
+
+对于双向：
+own边有inversedBy（=inverse边字段），OneToOne, ManyToOne, or ManyToMany
+inverse边有mappedBy（=own边字段），OneToOne, OneToMany, or ManyToMany 
+
+OneToOne的own边会有外键字段
+ManyToMany自由选择
+
+
+
+Batch Processing
+<?php
+$batchSize = 20;
+for ($i = 1; $i <= 10000; ++$i) {
+    $user = new CmsUser;
+    $user->setStatus('user');
+    $user->setUsername('user' . $i);
+    $user->setName('Mr.Smith-' . $i);
+    $em->persist($user);
+    if (($i % $batchSize) === 0) {
+        $em->flush();
+        $em->clear(); // Detaches all objects from Doctrine!
+    }
+}
+$em->flush(); //Persist objects that did not make up an entire batch
+$em->clear();
+
+
+<?php
+$batchSize = 20;
+$i = 0;
+$q = $em->createQuery('select u from MyProject\Model\User u');
+$iterableResult = $q->iterate();
+foreach ($iterableResult as $row) {
+    $user = $row[0];
+    $user->increaseCredit();
+    $user->calculateNewBonuses();
+    if (($i % $batchSize) === 0) {
+        $em->flush(); // Executes all updates.
+        $em->clear(); // Detaches all objects from Doctrine!
+    }
+    ++$i;
+}
+$em->flush();
+
+while (($row = $iterableResult->next()) !== false) {
+    $em->remove($row[0]);
+
+
+
+Doctrine Query Language
+有SELECT, UPDATE and DELETE，没有INSERT，
+$query = $em->createQuery('SELECT u FROM MyProject\Model\User u WHERE u.age > 20');
+$users = $query->getResult(); //list of User objects
+
+
+命名和位置参数
+"?1", "?2"
+":name1", ":name2"
+Query#setParameter($param, $value) 
+
+
+
+createQuery
+getResult
+getPhonenumbers（association loaded：$phonenumbers = $users[0]->getPhonenumbers();）
+COUNT(u.id)  聚合函数
+WHERE (u.username = :name OR u.username = :name2) AND u.id = :id'  ?1 
+COUNT DISTINCT
+AS 别名
+LEFT JOIN  JOIN  WITH
+WHERE TRIM(u.name)
+WHERE u.id IN(46)')
+CONCAT(u.id, u.name)
+EXISTS
+//。。。
+
+
+partial
+$query = $em->createQuery('SELECT partial u.{id, username} FROM CmsUser u');
+$users = $query->getResult(); // array of partially loaded CmsUser objects
+
+
+DQL Function
+The following functions are supported in SELECT, WHERE and HAVING clauses:
+
+    IDENTITY(single_association_path_expression [, fieldMapping]) - Retrieve the foreign key column of association of the owning side
+    ABS(arithmetic_expression)
+    CONCAT(str1, str2)
+    CURRENT_DATE() - Return the current date
+    CURRENT_TIME() - Returns the current time
+    CURRENT_TIMESTAMP() - Returns a timestamp of the current date and time.
+    LENGTH(str) - Returns the length of the given string
+    LOCATE(needle, haystack [, offset]) - Locate the first occurrence of the substring in the string.
+    LOWER(str) - returns the string lowercased.
+    MOD(a, b) - Return a MOD b.
+    SIZE(collection) - Return the number of elements in the specified collection
+    SQRT(q) - Return the square-root of q.
+    SUBSTRING(str, start [, length]) - Return substring of given string.
+    TRIM([LEADING \ BOTH] ['trchar' FROM] str) - Trim the string by the given trim char, defaults to whitespaces.
+    UPPER(str) - Return the upper-case of the given string.
+    DATE_ADD(date, days, unit) - Add the number of days to a given date. (Supported units are DAY, MONTH)
+    DATE_SUB(date, days, unit) - Substract the number of days from a given date. (Supported units are DAY, MONTH)
+    DATE_DIFF(date1, date2) - Calculate the difference in days between date1-date2.
+
+The following aggregate functions are allowed in SELECT and GROUP BY clauses: AVG, COUNT, MIN, MAX, SUM
+
+
+     ALL/ANY/SOME - Used in a WHERE clause followed by a sub-select this works like the equivalent constructs in SQL.
+    BETWEEN a AND b and NOT BETWEEN a AND b can be used to match ranges of arithmetic values.
+    IN (x1, x2, ...) and NOT IN (x1, x2, ..) can be used to match a set of given values.
+    LIKE .. and NOT LIKE .. match parts of a string or text using % as a wildcard.
+    IS NULL and IS NOT NULL to check for null values
+    EXISTS and NOT EXISTS in combination with a sub-select
+
+Add you own functions
+。。.
+
+
+Single Table Inheritance
+<?php
+namespace Entities;
+
+/**
+ * @Entity
+ * @InheritanceType("SINGLE_TABLE")
+ * @DiscriminatorColumn(name="discr", type="string")
+ * @DiscriminatorMap({"person" = "Person", "employee" = "Employee"})
+ */
+class Person
+{
+    /**
+     * @Id @Column(type="integer")
+     * @GeneratedValue
+     */
+    protected $id;
+
+    /**
+     * @Column(type="string", length=50)
+     */
+    protected $name;
+
+    // ...
+}
+
+/**
+ * @Entity
+ */
+class Employee extends Person
+{
+    /**
+     * @Column(type="string", length=50)
+     */
+    private $department;
+
+    // ...
+}
+
+table : id name discr department  -> single table
+SELECT e FROM Entities\Employee e WHERE e.name = 'test'
+=>
+SELECT p0_.id AS id0, p0_.name AS name1, p0_.department AS department2,
+       p0_.discr AS discr3 FROM Person p0_
+WHERE (p0_.name = ?) AND p0_.discr IN ('employee')
+
+
+Class Table Inheritance
+SINGLE_TABLE -> JOINED
+table Person: id name discr;  Employee: id department( id fk -> Person::id )
+
+
+
+Query Result
+hydration mode
+     Query#getResult(): Retrieves a collection of objects. The result is either a plain collection of objects (pure) or an array where the objects are nested in the result rows (mixed).
+    Query#getSingleResult(): Retrieves a single object. If the result contains more than one object, an NonUniqueResultException is thrown. If the result contains no objects, an NoResultException is thrown. The pure/mixed distinction does not apply.
+    Query#getOneOrNullResult(): Retrieve a single object. If no object is found null will be returned.
+    Query#getArrayResult(): Retrieves an array graph (a nested array) that is largely interchangeable with the object graph generated by Query#getResult() for read-only purposes. .. note:: An array graph can differ from the corresponding object graph in certain scenarios due to the difference of the identity semantics between arrays and objects.
+    Query#getScalarResult(): Retrieves a flat/rectangular result set of scalar values that can contain duplicate data. The pure/mixed distinction does not apply.
+    Query#getSingleScalarResult(): Retrieves a single scalar value from the result returned by the dbms. If the result contains more than a single scalar value, an exception is thrown. The pure/mixed distinction does not apply.
+
+Query#execute(array $params = array(), $hydrationMode = Query::HYDRATE_OBJECT)
+    Query::HYDRATE_OBJECT
+    Query::HYDRATE_ARRAY
+    Query::HYDRATE_SCALAR
+    Query::HYDRATE_SINGLE_SCALAR
+$users = $query->getResult(Query::HYDRATE_ARRAY);
+
+pure
+array
+    [0] => Object
+    [1] => Object
+    [2] => Object
+
+mixed
+array
+    [0]
+        [0] => Object
+        [1] => "some scalar string"
+        ['num'] => 42
+        // ... more scalar values, either indexed numerically or with a name
+    [1]
+        [0] => Object
+        [1] => "some scalar string"
+        ['num'] => 42
+        // ... more scalar values, either indexed numerically or with a name
+
+Conventions for mixed results are as follows:
+
+    The object fetched in the FROM clause is always positioned with the key '0'.
+    Every scalar without a name is numbered in the order given in the query, starting with 1.
+    Every aliased scalar is given with its alias-name as the key. The case of the name is kept.
+    If several objects are fetched from the FROM clause they alternate every row.
+
+
+Cache
+...
+
+
+Annotations Reference
+    @Column
+    @ColumnResult
+    @Cache
+    @ChangeTrackingPolicy
+    @CustomIdGenerator
+    @DiscriminatorColumn
+    @DiscriminatorMap
+    @Embeddable
+    @Embedded
+    @Entity
+    @EntityResult
+    @FieldResult
+    @GeneratedValue
+    @HasLifecycleCallbacks
+    @Index
+    @Id
+    @InheritanceType
+    @JoinColumn
+    @JoinColumns
+    @JoinTable
+    @ManyToOne
+    @ManyToMany
+    @MappedSuperclass
+    @NamedNativeQuery
+    @OneToOne
+    @OneToMany
+    @OrderBy
+    @PostLoad
+    @PostPersist
+    @PostRemove
+    @PostUpdate
+    @PrePersist
+    @PreRemove
+    @PreUpdate
+    @SequenceGenerator
+    @SqlResultSetMapping
+    @Table
+    @UniqueConstraint
+    @Version
+
+https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/annotations-reference.html#annotations-reference
+
+

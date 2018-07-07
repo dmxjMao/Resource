@@ -1,3 +1,5 @@
+
+
 Linux优势
 服务器稳定强大、服务器软件免费，服务器上上之选；
 便宜、速度快；
@@ -84,6 +86,78 @@ GNU计划
 虚拟机
 虚拟机，就是个软件，但是它能使用计算机的物理资源（cpu，内存，硬盘。。。），能虚拟出几个逻辑独立的操作系统，互不影响；
 virtualbox轻便免费；VMware先进商业；
+VirtualBox虚拟机网络设置（四种方式）
+https://www.douban.com/group/topic/15558388/
+VirtualBox的提供了四种网络接入模式，它们分别是： 
+1、NAT 网络地址转换模式(NAT,Network Address Translation) 
+2、Bridged Adapter 桥接模式 
+3、Internal 内部网络模式 
+4、Host-only Adapter 主机模式 
+
+第一种 NAT模式 
+解释： 
+NAT模式是最简单的实现虚拟机上网的方式，你可以这样理解：Vhost访问网络的所有数据都是由主机提供的，vhost并不真实存在于网络中，主机与网络中的任何机器都不能查看和访问到Vhost的存在。 
+虚拟机与主机关系： 
+只能单向访问，虚拟机可以通过网络访问到主机，主机无法通过网络访问到虚拟机。 
+虚拟机与网络中其他主机的关系： 
+只能单向访问，虚拟机可以访问到网络中其他主机，其他主机不能通过网络访问到虚拟机。 
+虚拟机与虚拟机之间的关系： 
+相互不能访问，虚拟机与虚拟机各自完全独立，相互间无法通过网络访问彼此。 
+IP:10.0.2.15 
+网关：10.0.2.2 
+DNS：10.0.2.3 
+一台虚拟机的多个网卡可以被设定使用 NAT， 第一个网卡连接了到专用网 10.0.2.0，第二个网卡连接到专用网络 10.0.3.0，等等。默认得到的客户端ip（IP Address）是10.0.2.15，网关（Gateway）是10.0.2.2，域名服务器（DNS）是10.0.2.3，可以手动参考这个进行修改。 
+NAT方案优缺点： 
+笔记本已插网线时： 虚拟机可以访问主机，虚拟机可以访问互联网，在做了端口映射后（最后有说明），主机可以访问虚拟机上的服务（如数据库）。 
+笔记本没插网线时： 主机的“本地连接”有红叉的，虚拟机可以访问主机，虚拟机不可以访问互联网，在做了端口映射后，主机可以访问虚拟机上的服务（如数据库）。 
+
+第二种 Bridged Adapter模式 
+解释： 
+网桥模式是我最喜欢的用的一种模式，同时，模拟度也是相当完美。你可以这样理解，它是通过主机网卡，架设了一条桥，直接连入到网络中了。因此，它使得虚拟机能被分配到一个网络中独立的IP，所有网络功能完全和在网络中的真实机器一样。 
+虚拟机与主机关系： 
+可以相互访问，因为虚拟机在真实网络段中有独立IP，主机与虚拟机处于同一网络段中，彼此可以通过各自IP相互访问。 
+虚拟机于网络中其他主机关系： 
+可以相互访问，同样因为虚拟机在真实网络段中有独立IP，虚拟机与所有网络其他主机处于同一网络段中，彼此可以通过各自IP相互访问。 
+虚拟机于虚拟机关系： 
+可以相互访问，原因同上。 
+IP：一般是DHCP分配的，与主机的“本地连接”的IP 是同一网段的。虚拟机就能与主机互相通信。 
+笔记本已插网线时：（若网络中有DHCP服务器）主机与虚拟机会通过DHCP分别得到一个IP，这两个IP在同一网段。 主机与虚拟机可以ping通，虚拟机可以上互联网。 
+笔记本没插网线时：主机与虚拟机不能通信。主机的“本地连接”有红叉，就不能手工指定IP。虚拟机也不能通过DHCP得到IP地址，手工指定IP后，也无法与主机通信，因为主机无IP。 
+这时主机的VirtualBox Host-Only Network 网卡是有ip的，192.168.56.1。虚拟机就算手工指定了IP 192.168.56.*，也ping不能主机。 
+
+第三种 Internal模式 
+解释： 
+内网模式，顾名思义就是内部网络模式，虚拟机与外网完全断开，只实现虚拟机于虚拟机之间的内部网络模式。 
+虚拟机与主机关系： 
+不能相互访问，彼此不属于同一个网络，无法相互访问。 
+虚拟机与网络中其他主机关系： 
+不能相互访问，理由同上。 
+虚拟机与虚拟机关系： 
+可以相互访问，前提是在设置网络时，两台虚拟机设置同一网络名称。如上配置图中，名称为intnet。 
+IP: VirtualBox的DHCP服务器会为它分配IP ，一般得到的是192.168.56.101，因为是从101起分的，也可手工指定192.168.56.*。 
+笔记本已插网线时：虚拟机可以与主机的VirtualBox Host-Only Network 网卡通信 
+这种方案不受主机本地连接（网卡）是否有红叉的影响。 
+
+第四种 Host-only Adapter模式 
+解释： 
+主机模式，这是一种比较复杂的模式，需要有比较扎实的网络基础知识才能玩转。可以说前面几种模式所实现的功能，在这种模式下，通过虚拟机及网卡的设置都可以被实现。 
+我们可以理解为Vbox在主机中模拟出一张专供虚拟机使用的网卡，所有虚拟机都是连接到该网卡上的，我们可以通过设置这张网卡来实现上网及其他很多功能，比如（网卡共享、网卡桥接等）。
+虚拟机与主机关系 
+默认不能相互访问，双方不属于同一IP段，host-only网卡默认IP段为192.168.56.X 子网掩码为255.255.255.0，后面的虚拟机被分配到的也都是这个网段。通过网卡共享、网卡桥接等，可以实现虚拟机于主机相互访问。 
+虚拟机与网络主机关系 
+默认不能相互访问，原因同上，通过设置，可以实现相互访问。 
+虚拟机与虚拟机关系 
+默认可以相互访问，都是同处于一个网段。 
+虚拟机访问主机 用的是主机的VirtualBox Host-Only Network网卡的IP：192.168.56.1 ，不管主机“本地连接”有无红叉，永远通。 
+主机访问虚拟机，用是的虚拟机的网卡3的IP： 192.168.56.101 ，不管主机“本地连接”有无红叉，永远通。 
+虚拟机访问互联网，用的是自己的网卡2， 这时主机要能通过“本地连接”有线上网，（无线网卡不行） 
+
+通过对以上几种网络模式的了解，我们就可以灵活运用，模拟组建出我们所想要的任何一种网络环境了。 
+比如我想模拟出来一个一台主机，监控一个局域网上网情况的网络环境。 
+首先我开启了两台虚拟机vhost1与vhost2，当然如果硬件允许，我同样可以再增加vhost3、vhost4… 
+所有的vhost我都设置成internat内网模式，网络名称为intnal，网关为192.168.56.100，意思就是通过 192.168.56.100网卡上网。其中有一台vhost1我设置为双网卡，一张为内网模式（192.168.56.100），一张为网桥模式（192.168.1.101）。两张网卡设置双网卡共享上网 
+虚拟机之间为局域网，其中有一台虚拟机vhost1通过与外网相连，所有局域网中的虚拟机又通过vhost1来实现上外网。这样vhost1就可以监控整个虚拟机局域网上网情况了。 
+
 
 安装Linux主机
 必须要针对distributions的特性、服务器软件的能力、未来的升级需求、硬件扩充需求等等来考虑，进行合理的主机规划，《硬件-选购》；
@@ -149,6 +223,7 @@ Tarball软件
 就是将源码用tar打包，再gzip压缩，tarball文件 *.tar.gz之类的；
  
 
+
 RPM
 直接拿厂商提供的可执行文件；
 Fedora，CentOS，SuSE等使用；
@@ -191,6 +266,263 @@ baseurl-》软件库的实际网址
 yum [grouplist可用群组groupinfo组内软件名groupinstall安装所有groupremove移除]
 
 
+Samba
+rpm -qi samba 安装信息
+报错：Cannot find a valid baseurl for repo: base/7/x86_64
+无法联网：setting-》Network；
+yum -y install samba samba-client
+cd /etc/samba/
+mv smb.conf smb.conf.origin备份smb.conf
+vim smb.conf 内容参考已存；
+
+
+smbpasswd -a mao  -e  smb123
+firewall-cmd --list-services
+firewall-cmd --permanent --add-service=samba
+ firewall-cmd –reload
+重启smb服务
+报错：Failed to start Samba SMB Daemon.
+testparm查看/etc/samba/smb.conf是否正确，发现security=share已经废弃，改为user，重启服务；
+windows中输入：\\虚拟机ip，即可访问虚拟机；
+
+systemctl status network
+报错：Failed to start LSB: Bring up/down networking. 
+不用network，NetworkManager集成了它，可以更方便的切换网卡的配置；
+nmcli device status(ifconfig -a) 查看网络配置
+nmcli device show ens39 
+nmcli connection show
+enp0s3没有配置文件，所以无法连接网络，因为是桥接，所以要手动配置虚拟机ip
+配置见：/etc/sysconfig/network-scripts
+BOOTPROTO=dhcp 是自动获取ip，改为static
+ONBOOT=yes
+HWADDR=08:00:27:80:28:28
+MACADDR=08:00:27:80:28:28
+IPADDR=192.168.0.144
+NETMASK=255.255.255.0
+GATEWAY=192.168.0.1
+DNS1=192.168.0.22
+DNS2=114.114.114.114
+DNS3=8.8.8.8
+PEERDNS="0"
+主机ip: 192.168.0.143，DNS3，PEERDNS好像没什么用；
+
+如果虚拟机要ping通windows，要把windows防火墙关了；
+要拷贝内容到share目录，还得关闭SELinux，vim /etc/selinux/config；临时关闭：setenforce 0；
+VirtualBox的网卡一定要选择正确，无线和有线是不一样的；
+
+VirtualBox 网络配置：NAT，它是单向的，主机无法ping通虚拟机，改用桥接；
+
+
+apache+php+mysql
+mysql
+www.mysql.com → MySQL Community Server →  参考官网手册：2.2 Installing MySQL on Unix/Linux Using Generic Binaries 下面的都是过时的（教训）
+
+bin/mysqld –initialize –user=mysql 会有一个初始密码，要记住
+
+重新初始化报错：data目录不为空
+找my.cnf，把data删了；
+
+bin/mysqld_safe --user=mysql & 手动后台运行mysql服务，ps -aux|grep mysql查看；
+报错：mysqld_safe error: log-error set to '/var/log/mariadb/mariadb.log', however file don't exists. Create writable for user 'mysql'.
+修改my.cnf，把mariadb配置去掉；
+登录mysql客户端：bin/mysql -u root -p，报错：无法使用/tmp/mysql.sock-》配置my.cnf，[mysql] 
+
+
+service mysql(.service) status ->  SUCCESS! MySQL running (5342)，它好像会启动/etc/init.d/mysql
+如何用systemctrl 设置mysql.service
+vim /etc/systemd/system/mysql.service
+[Unit]
+Description=MySQL Server
+Documentation=man:mysqld(8)
+Documentation=http://dev.mysql.com/doc/refman/en/using-systemd.html
+After=network.target
+After=syslog.target
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=mysql
+Group=mysql
+ExecStart=/usr/local/mysql/bin/mysqld --defaults-file=/etc/my.cnf
+LimitNOFILE = 5000
+#Restart=on-failure
+#RestartPreventExitStatus=1
+#PrivateTmp=false
+修改ExecStart即可，然后就能用systemctrl管理了；
+systemctrl enable mysql开启启动
+Created symlink from /etc/systemd/system/multi-user.target.wants/mysql.service to /etc/systemd/system/mysql.service.
+
+没有/etc/my.cnf？可能是用了mysqlnd,mysqli什么的，在/etc/my.cf.d下，拷贝一个到/etc/mysql/my.cnf
+
+export PATH=$PATH:/usr/local/mysql/bin，重启就失效了；
+mysql -u root -p -> set password='123456';   mysql123
+
+
+开机作为服务启动（废弃）
+cp support-files/mysql.server /etc/init.d/mysql.server
+在/etc/rc.local里添加：systemctl start mysql.server.service
+chkconfig --add mysql.server
+
+
+
+httpd
+rpm -ql apache；
+
+安装Development Libraries与Development tools
+yum grouplist 
+yum -y groupinstall development tools
+提示没有包可下载，就是不用下了。
+
+httpd编译也依赖pcre-devel软件包
+yum -y install pcre-devel
+openssl version 查看版本
+yum install -y libxml2-devel
+yum install openssl openssl-devel； --with-ssl
+
+
+下载apr和apr-util
+https://apr.apache.org
+/usr/local/src下解压编译安装
+tar -xjvf apr-xxx.tar.bz2
+cd apr-xxx
+./configure –prefix=/usr/local/apr
+make; make install
+apr-util同理，不过安装过错报错：
+xml/apr_xml.c:35:19: fatal error: expat.h: No such file or directory
+ #include <expat.h>
+原因可能是CentOS.ios缺少依赖
+yum install expat-devel；再重新make；
+这样/usr/local/下就有apr和apr-util两个文件夹了。
+
+
+https://httpd.apache.org -》 安装：https://httpd.apache.org/docs/2.4/
+./configure  –with-apr=/usr/local/apr –with-apr-util=/usr/local/apr-util
+默认–prefix=/usr/local/apache2，默认开启—enable-so
+bin/apachectrl -k start报错：
+httpd: Syntax error on line 66 of /etc/httpd/httpd.conf: Cannot load modules/mod_mpm_event.so into server: /usr/local/apache/modules/mod_mpm_event.so: cannot open shared object file: No such file or directory
+安装的之前，把/etc/httpd删掉，那是之前安装留下的
+
+
+使用systemctrl管理
+同mysql，但是不行；
+
+apache开机启动
+cp /usr/local/apache/bin/apachectl /etc/init.d/httpd
+vi httpd 在#!/bin/sh下加：#chkconfig:345 85 15 #description: …
+chkconfig --add httpd  chkconfig httpd on 作为服务并开机启动。
+#/etc/rc.local 添加 /usr/local/apache2/bin/apachectrl -k start，开机启动。
+
+
+httpd: Could not open configuration file /etc/httpd/httpd.conf: No such file or directory
+删掉/etc/httpd报错。
+httpd就用conf/httpd.conf下的；
+
+(98)Address already in use: AH00072: make_sock: could not bind to address [::]:80
+(98)Address already in use: AH00072: make_sock: could not bind to address 0.0.0.0:80
+no listening sockets available, shutting down
+bin/apachectl -k start报错，端口占用
+ps -ef | grep httpd 查看包含httpd的进程信息
+
+netstat -lnp|grep 80  查看80端口是否被占用
+-> tcp6       0      0 :::80                   :::*                    LISTEN      15205/httpd 
+可以看到，其实httpd已经起来了，你也可以kill -9 15205强制杀死httpd进程再重启一遍; 
+
+
+
+
+
+
+
+php
+www.php.net
+/usr/local/src → tar -xjvf → cd php-xxx → ./configure …  make & make install-s
+同样吸取教训，按官网来。
+./configure --with-apxs2=/usr/local/apache/bin/apxs
+--with-mysqli  //mysql的增强版
+--with-pdo-mysql
+--with-zlib( symfony )
+--with-openssl
+
+报错：Cannot find OpenSSL’s <evp.h>
+yum install openssl-devel，继续报错，yum被弄坏了
+yum clean all
+rm -f /var/lib/rpm/__db*
+rpm –rebuilddb
+yum update（应该可以不用）
+yum install openssl-devel
+
+php无法使用mysql，报错：找不到驱动
+php -m |grep -i "pdo"
+
+配置mysql
+http://www.runoob.com/php/php-mysql-connect.html
+http://php.net/manual/en/mysqli.installation.php
+php-mysql包，ext/mysql, ext/mysqli, and pdo_mysql PHP extensions.
+yum install php-mysql
+
+安装PDO
+http://php.net/manual/en/pdo.installation.php
+./configure只是配置，扩展还是要自己去下载的
+http://pecl.php.net/get/PDO_MYSQL-1.0.2.tgz 官网下载
+https://www.cnblogs.com/metasequoia/p/3968081.html
+
+php自带很多扩展：
+/usr/local/src/php-5.6.36/ext/pdo_mysql
+
+安装php扩展
+cd phpxxx/ext/=》 whereis phpize，如果没有yum install php-devel
+xx/phpize ->生成config文件
+./configure --with-php-config=(whereis php-config)
+make & make install
+
+编译完之后会生成：apache2/modules/libphp5.so
+
+cp php.ini-development /usr/local/lib/php.ini
+apache加入php模块
+httpd.conf
+LoadModule php5_module modules/libphp5.so
+<FilesMatch \.php$>
+    SetHandler application/x-httpd-php
+</FilesMatch>
+重启apache，测试
+apaceh/htdocs，test.php 输入 <?php phpinfo() ?> -》 localhost/test.php
+
+
+test.php原样输出
+因为httpd.conf里加了这个，把它去掉
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+
+Symfony框架
+Symfony中国，php symfony，报错：
+PHP Fatal error:  Uncaught exception 'PharException' with message 'zlib extension is required for gz compressed .phar file "/usr/local/web/symfony"' in /usr/local/web/symfony:9
+Stack trace:
+#0 /usr/local/web/symfony(9): Phar::mapPhar('defaiult.phar')
+
+phpinfo() 页面：
+
+gzip compression 	disabled (install ext/zlib) 
+bzip2 compression 	disabled (install pecl/bz2) 
+OpenSSL support 	disabled (install ext/openssl) 
+Whereis zlib → cd php-xxx, ./configure –help , --with-zlib→ 三步走
+
+symfony new prj，报错：
+
+Unable to find the wrapper "https" - did you forget to enable it when you configured PHP?
+Cd php-xxx, ./configure –with-openssl
+
+安装php扩展：zlib和curl，yum install curl curl-devel；
+
+caching_sha2问题
+修改my.cnf，[mysqld] 
+default... = mysql_native_password
+
+mysqli_real_connect() 字符集问题
+[mysqld]
+collation-server=…
+character-set-server:utf8mb4
 
 
 
@@ -339,6 +671,8 @@ find / -perm /7000 –exec ll {}\;  action，{}代表查找内容；
 《鸟叔Chap8.4、8.5、8.6》
 ====================================================
 
+
+
 压缩
 *.Z 		compress 程序压缩的文件，过时； 
 *.zip 	zip 程序压缩的文件，兼容win； 
@@ -400,10 +734,17 @@ u复原，ctrl+r重做；
 /(?)word查找；
 :n1,n2s/word1/word2/g(c提示用户)，[n1,n2]行之间将word1替换为word2；:1,$s/word1/word2/g;
 .小数点，重复上一个动作；
-:set nu行号；
+
 
 区块操作
 v选择列，V选择行, Ctrl+v区块选择, y复制反白, d删除反白,p粘贴，配合n，方向键；
+批量注释
+V选择行，ctrl + v, 大写I，输入//，然后连按两下Esc；
+vim复制粘贴到外部
+vim --version|grep “clipboard”
+如果-clipboard前面是-号，说明不支持粘贴到外部
+
+
 
 多文本编辑
 vim a.txt b.txt...
@@ -416,23 +757,18 @@ ctrl+alt+t，新建tab页；
 ctrl+t，设置快捷键，打开Terminal；
 
 
-自动补齐
-ctrl+x -> ctrl+n，【文件出现的内容】；
-ctrl+x -> ctrl+o 【vim根据扩展名，使用内建关键词】；
 
-配置
-~/.viminfo 记录行为；~/.vimrc记录配置；
-/etc/vimrc不建议修改，cp /etc/vimrc ~/.vimrc，然后修改；
-:set nu	行号
-:set autoindent	自动缩排
-:set ruler	状态栏
-:set showmode	--INSERT--状态栏。
 
-:set backspace=(012)	backspace 为2 时，可以删除任意值；0 或1 时，仅可删除刚刚输入的字符
-:syntax on:syntax off	语法高亮
-	
-set ts=4，设置tab=4个空格
-	
+插件
+https://github.com/Vim/vim  注意Vim大写
+Vundle, github.com/VundleVim
+https://www.vim.org/
+pathogen，不要拷贝到/usr/share/vim/vim74/autoload下！它在~/.vim里！
+Universal Ctags ：https://github.com/universal-ctags/ctags
+taglist
+NERD tree :git clone https://github.com/scrooloose/nerdtree.git ~/.vim/bundle/nerdtree
+~/.vim/bundle/nerdtree/doc/， 其实并没有用，还是要拷贝到vim74里；
+vim-nerdree-tabs
 
 
 
