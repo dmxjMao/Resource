@@ -478,7 +478,9 @@ make & make install
 
 编译完之后会生成：apache2/modules/libphp5.so
 
-cp php.ini-development /usr/local/lib/php.ini
+cp php.ini-development /usr/local/lib/php.ini(不读/etc/php.ini)
+date.timezone = asia/shanghai
+
 apache加入php模块
 httpd.conf
 LoadModule php5_module modules/libphp5.so
@@ -496,7 +498,12 @@ test.php原样输出
 </FilesMatch>
 
 Symfony框架
-Symfony中国，php symfony，报错：
+sudo curl -LsS https://symfony.com/installer -o /usr/local/bin/symfony
+sudo chmod a+x /usr/local/bin/symfony
+symfony new my_project_name 3.4
+symfony demo
+
+php symfony，报错：
 PHP Fatal error:  Uncaught exception 'PharException' with message 'zlib extension is required for gz compressed .phar file "/usr/local/web/symfony"' in /usr/local/web/symfony:9
 Stack trace:
 #0 /usr/local/web/symfony(9): Phar::mapPhar('defaiult.phar')

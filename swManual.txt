@@ -242,6 +242,9 @@ Alt+C清空搜索
 Ctrl+N 新建粘贴
 Ctrl+F7 新建组 Ctrl+G 打开组
 
+Friends
+只能发送给局域网内的人，ping 对方的ip；
+
 
 Redis
 部署redis服务：
@@ -394,6 +397,10 @@ git commit 从版本库删除
 
 
 更新文件
+git log -p master Resource/master查看远程和本地的版本历史
+git fetch Resource master 下载到stage
+git merge Resource/master 合并到本地仓库
+
 git pull 远程主机名 远程分支名：本地分支名（合并）
 git pull origin next:master // 取远程origin主机 next分支，与本地master合并
 git pull origin // 如果当前分支与远程分支存在追踪关系
@@ -615,6 +622,7 @@ https://www.3dmark.com/
 
 vim
 https://github.com/Vim/vim  注意Vim大写
+vertical resize-5
 
 yum remove vim-*
 yum -y install ncurses-devel.x86_64
@@ -706,7 +714,32 @@ Syntastic
 语法检查。
 
 fugitive.vim
-git工具。
+git工具，文档：https://git-scm.com/docs
+首先你得有一个git仓库：git init
+:Gstatus 仓库状态窗口，输入g? 打开帮助
+常用：
+git remote -v查看远程仓库
+git branch -a
+
+git config --global user.name "Your Name"
+git config --global user.email you@example.com
+
+- add； enter打开文件
+cc commit,输入message，:wq
+
+git remote add mydail <url>
+git config --global push.default simple 推送到相同名字（push写得简单）
+git push --set-upstream mydaily master
+错误：fatal: The current branch master has no upstream branch. 没有关联本地和远程分支
+
+另一台主机
+git clone url
+composer install, 安装所有依赖
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+仿照symfony, /usr/local/bin/  全局
 
 emmet
 强大的html,css,xml缩写引擎，类css写法；
@@ -741,3 +774,5 @@ V选择行，ctrl+y+','，输入Tag：ul>li* 或 blockquote
 	-bdrs前缀
 
 
+Plugin 'tmhedberg/SimpylFold'
+代码折叠
