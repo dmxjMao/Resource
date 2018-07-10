@@ -210,6 +210,17 @@ UEFI，定位和BIOS一样，P94；
 安装报错：
 The virtual machine 'Centos7-Everything' has terminated unexpectedly during startup with exit code 1 (0x1). More details may be available in 'C:\Users\dmxjMao\VirtualBox VMs\Centos7-Everything\Logs\VBoxHardening.log'.
 
+/bin 可执行程序
+/boot 开机使用的文件
+/dev 设备文件
+/etc 配置文件
+/lib 库
+/media 可移除设备，软盘光盘DVD
+/mnt 暂时挂载点
+/opt 三方软件
+/run 运行时文件
+/sbin 开机所需
+/
 
 
 软件安装
@@ -567,12 +578,21 @@ shutdown：关机；
 文件系统
 结构
 文件系统是针对分区(partition)的，本地、网络上的filesystem都可以挂载，对分区格式化以建立fs；
-
- 
+磁盘
+	分区1	分区2	。。。		分区n
+			||||
+		  文件系统
+超级块  柱面1	柱面2	。。。		柱面n
+				||||
+	配置块 i结点图 块位图 i结点 			数据块
+						||||   			 ||||
+					inode1 inodeN 	block1 blockN
+ 1个inode对应一个文件（多个数据块）或目录(一个目录块)，
  
 
 挂载
 将目录作为“进入点”（称为挂载点），进入磁盘分区槽的数据所在位置；
+
  
 
 权限
@@ -795,89 +815,26 @@ shift + PageUp/PageDown，终端翻页；
 ctrl+u、k删除光标前、后指令串；
 atl 1~9终端分页切换，shift+ctrl+T新建分页，shift+ctrl+N新建窗口；
 
-通配符
-*、?、[]、[-]、[^]，和regex一模一样；
-#注释、\转义、;连续指令、!非
-&指令后台执行
-|管道
->,>> 流重定向，取代和累加
-<,<< 流重定向
-‘’，$是纯文本，””，$保留功能
-``  先执行的指令
-() 子shell的起始结束
-{} 命令区块的组合
-
-正则
-语系影响匹配，默认LANG=C，兼容POSIX标准；
-[:alnum:] [0-9][a-z][A-Z]
-[:alpha:] [a-z][A-Z]  [:lower:] , [:upper:]
-[:blank:] 空格和tab
-[:cntrl:] 控制键，ctrl，上下左右，tab，del，bs。。。
-[:digit:] [0-9]
-[:graph:] 除了[:blank:]
-[:print:] 可打印字符
-[:punct:] 标点符号
-[:space:] 能产生空白的字符，ctrl
-[:xdigit:] [0-9A-Fa-f]
-^$行首行尾，grep ‘^$’ 空白行
-.*
-{m,n}，’o\{2,5\}’
-
-延伸正则
-egrep
-+ {1,n}
-? {0,1}
-| 或
-() 组
-()+ 组
-
-
-
-grep [-A后跟数字，after后面几行B before几行—color=auto –n行号] ‘查找字符串’ filename
-
-sed [-n处理过的行才列出ef将sed动作写到文件内r延伸语法i修改文件] ‘[n1,n2行$最后一行] action，分析stdin，取代删除新增撷取特定行，管道命令；
-function：a新行新增，\再新增一行，c取代，d删除，i插入，p打印，s取代可搭配正则；
-nl /etc/passwd | sed ‘2,5d’ 删除2,5行
-sed –n ‘5,7p’ = head –n 7 | tail –n 4
-sed ‘s/旧/新/g’
-
-awk ‘{条件}. {动作..}.‘ filename，sed行处理，awk倾向于一行的分段处理；
-last –n 5 | awk ‘{print $1 “\t” $3 “lines:” NR第几行” \t cols:” NF共几列 FS当前分隔符 }’ 打印1,3列，默认列以空格或tab分隔，$0整行
-条件： >,<,>=,<=,==, !=
-cat /etc/passwd | awk ‘{FS=”:”} $3 < 10 {print $1 “\t” $3}’
-
-cat pay.txt | \ 
-> awk '{if(NR==1) printf "%10s %10s %10s %10s %10s\n",$1,$2,$3,$4,"Total"} 
-> NR>=2{total = $2 + $3 + $4 
-> printf "%10s %10d %10d %10d %10.2f\n", $1, $2, $3, $4, total}' 
-多条指令动作，分号或Enter；
-变量直接用；
-
-
-文件比对
-diff [-b多个空白相同B多行空白相同i大小写] file_src file_des，以行为单位比对
-
-cmp [-l列出所有不同字节，默认第一个]，字节比对
-
 
 变量
 规则
-echo $变量名，查看变量；
+echo $变量名或${变量名}，查看变量；
 	变量名=变量值（不能有空格）；
 	[a-zA-Z0-9]，开头不能是数字；
 	单引号，特殊字符为一般字符，双引号，var=”lang is $LANG”，保留特性，有些；
 	可以用’\’转义特殊字符，如[Enter],$,\,空格,’等；
 	赋值指令结果：var=$(指令)或`指令`；
 	代表变量值：”$变量名”或$(变量名)；
-	export 变量名，变成环境变量，共享；
+	export 变量名，变成环境变量，父子bash共享；
 	unset 变量名，取消变量；
 
 
-变量修改
+变量声明
 read [-p提示t等待秒数] 变量，读取变量；
 declare [-a数组i整型x同export-r同const-p列出变量类型+aixr取消] 变量，声明变量，默认字符串；
 
-删除
+
+变量内容的修改
 ${变量#/*local/bin:}  ${变量}格式，#前面开始删，最短，##最长；%从后面开始删，%%；
 
 替换
@@ -900,8 +857,12 @@ unalias，取消别名；
 
 环境配置
 env，查看环境变量；
+$RANDOM 产生0~32767的数
 set，查看env+自定义；
 ?， 上一个指令的回传值；
+export
+bash-》PID，它再执行bash就是子程序了，子程序不能继承父程序的自定义变量，export就可以了；
+
 
 /etc/issue 欢迎信息，/etc/issue.net telnet的主机登入画面，/etc/motd给登入者提示，P455；
 
@@ -910,9 +871,6 @@ login shell流程：读取/etc/profile系统设定，读取~/.bash_profile或~/.
 /etc/profile主要内容：环境变量、/etc/profile.d/*.sh包含其他脚本等；
 然后读取个人配置；
 
-source
-不用注销，使配置生效；
-source 配置文件，或 .小数点 配置文件，将配置读进当前shell；
 
 non-login shell 只读取~/.bashrc；
 
@@ -1004,6 +962,70 @@ split –b 300k /etc/services services（生成的小文件自动以xxxxaa/ab/ac
 cat services* >> servicesback 合成一个文件
 ll –a / | split –l 10 – lsroot ，10行一个文件；
 
+通配符
+*、?、[]、[-]、[^]，和regex一模一样；
+#注释、\转义、;连续指令、!非
+&指令后台执行
+|管道
+>,>> 流重定向，取代和累加
+<,<< 流重定向
+‘’，$是纯文本，””，$保留功能
+``  先执行的指令
+() 子shell的起始结束
+{} 命令区块的组合
+
+正则
+语系影响匹配，默认LANG=C，兼容POSIX标准；
+[:alnum:] [0-9][a-z][A-Z]
+[:alpha:] [a-z][A-Z]  [:lower:] , [:upper:]
+[:blank:] 空格和tab
+[:cntrl:] 控制键，ctrl，上下左右，tab，del，bs。。。
+[:digit:] [0-9]
+[:graph:] 除了[:blank:]
+[:print:] 可打印字符
+[:punct:] 标点符号
+[:space:] 能产生空白的字符，ctrl
+[:xdigit:] [0-9A-Fa-f]
+^$行首行尾，grep ‘^$’ 空白行
+.*
+{m,n}，’o\{2,5\}’
+
+延伸正则
+egrep
++ {1,n}
+? {0,1}
+| 或
+() 组
+()+ 组
+
+
+
+grep [-A后跟数字，after后面几行B before几行—color=auto –n行号] ‘查找字符串’ filename
+
+sed [-n处理过的行才列出ef将sed动作写到文件内r延伸语法i修改文件] ‘[n1,n2行$最后一行] action，分析stdin，取代删除新增撷取特定行，管道命令；
+function：a新行新增，\再新增一行，c取代，d删除，i插入，p打印，s取代可搭配正则；
+nl /etc/passwd | sed ‘2,5d’ 删除2,5行
+sed –n ‘5,7p’ = head –n 7 | tail –n 4
+sed ‘s/旧/新/g’
+
+awk ‘{条件}. {动作..}.‘ filename，sed行处理，awk倾向于一行的分段处理；
+last –n 5 | awk ‘{print $1 “\t” $3 “lines:” NR第几行” \t cols:” NF共几列 FS当前分隔符 }’ 打印1,3列，默认列以空格或tab分隔，$0整行
+条件： >,<,>=,<=,==, !=
+cat /etc/passwd | awk ‘{FS=”:”} $3 < 10 {print $1 “\t” $3}’
+
+cat pay.txt | \ 
+> awk '{if(NR==1) printf "%10s %10s %10s %10s %10s\n",$1,$2,$3,$4,"Total"} 
+> NR>=2{total = $2 + $3 + $4 
+> printf "%10s %10d %10d %10d %10.2f\n", $1, $2, $3, $4, total}' 
+多条指令动作，分号或Enter；
+变量直接用；
+
+
+文件比对
+diff [-b多个空白相同B多行空白相同i大小写] file_src file_des，以行为单位比对
+
+cmp [-l列出所有不同字节，默认第一个]，字节比对
+
 
 Shell Scripts
 脚本，批处理文件；
@@ -1016,13 +1038,17 @@ n个空白，tab等等同；
 执行 
 xx.sh 需要rx权限；
 1）/home/../xx.sh；2）./xx.sh；3）PATH，sh xx.sh；
+4) source
+不用注销，使配置生效；
+source 配置文件，或 .小数点 配置文件，将配置读进当前shell；
+
+debug
+sh [-n检查语法v将脚本输出屏幕x只输出执行的脚本] xx.sh
 
 习惯
 script文件头记录
 • script 的功能；
 • script 的版本信息；
-
-
 • script 的作者与联络方式；
 • script 的版权宣告方式；
 • script 的History (历史纪录)；
@@ -1042,12 +1068,13 @@ exit 0  #$0返回值
 用户输入
 read，P528
 
-随日期变化
+文件名随日期变化
 date，P528
 
 数值运算
-declare –i total=${val1}+-*/(整数)${val2}
+declare –i total=${val1}+-*/(整数)${val2} 只能整数
 小数：echo “123.123*44.9” | bc
+
 
 
 
@@ -1059,6 +1086,93 @@ $?=0指令执行成功，
 cmd1 && cmd2，cmd1正确则开始cmd2，否则不执行；
 cmd1 || cmd2，cmd1正确则cmd2不执行，否则执行；
 
-/tmp/abc不管存在否，都建立hehe文件
-ls /tmp/abc || mkdir /tmp/abc && touch /tmp/abc/hehe &&和||只和上一条cmd $? 有关；
+test指令
+test -e /档名 是否存在 -f文件是否存在 -d目录 P534
 
+[]判断符
+每个组件都要空格分隔
+[ -z "${HOME}" ]变量是否为空
+[ ${name} == "VBird" ]
+选项同test，P534
+
+shell script的默认变量
+${0 1 2...} 脚本名 参数1 ...
+$# 参数个数
+$@ 全部参数
+
+
+
+逻辑语法
+if [ 条件判断式 ]; then 
+[elif]; then
+[else]
+fi 
+
+case $变量名 in
+"第一个变量内容") 
+	程序段 ;; 
+"第二个变量内容") 
+	程序段 ;; 
+*) <==* 来代表所有其他值 
+	exit 1 ;; 
+esac
+
+function
+function fname() {}
+shell执行从上到下，从左到右
+内部也有$0, $1，如：
+function foo(){  //... }
+foo 1 b $1(shell script的$1)
+
+
+while/until [ condition ] 
+do 
+	程序段落 
+done
+
+for var in con1 con2 con3 ...
+do
+	程序段落
+done
+
+for (( 初始值; 限制值; 执行步阶 )) do 程序段 done
+
+
+
+进程管理
+Bash有一个PID
+cp file1 file2 & 后台
+ctrl+z 丢到后台运行
+jobs [-l列出PID r仅列出run的job s仅列出stop的job]
+bg %3 恢复stop的job
+kill -9 %2 关闭job
+
+ps a不与terminal相关的PID u有效用户相关 x完整信息  进程快照
+Stat: R(unning),S(leep),D等待I/O等，T(stop)，Z(ombie)进程已终止但无法移除至内存外
+top [-bnp]动态观察进程状态，P711
+pstree [-A][-u列出所属账号p列出PID]，进程相关性
+
+daemon
+守护进程，系统服务
+/usr/lib/systemd/system/
+/etc/systemd/system/ 开机启动的服务，是上面的link -s
+systemctl list-unit-files --type=service ...
+服务配置项
+[Unit]
+Description=OpenSSH server daemon 	#systemctl list/status
+After=network.target sshd-keygen.service  #在哪个daemon之后启动，不强制，Requires明确指定
+Wants=sshd-keygen.service #这个daemon之后最好启动
+Conflicts=...
+Before=...
+
+[Service]/[Socket]/[Timer]/[Mount]/[Path] 好几种Unit Type
+Type=...simple默认，P783
+EnvironmentFile=/etc/sysconfig/sshd  #环境配置文件
+ExecStart=/usr/sbin/sshd -D $OPTIONS #实际执行daemon的指令或脚本
+ExecReload=/bin/kill -HUP $MAINPID 
+KillMode=process 
+Restart=on-failure
+RestartSec=42s
+
+[Install] Unit挂载到哪个target
+WantedBy=multi-user.target #大多service type挂载这里
